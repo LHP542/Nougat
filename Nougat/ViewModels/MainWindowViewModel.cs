@@ -39,8 +39,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public partial string OutputDirectory { get; set; } = "";
     [ObservableProperty] public partial string StatusText { get; set; } = "Bereit.";
     [ObservableProperty] public partial double Progress { get; set; }
-    [ObservableProperty] public partial bool IsBusy { get; set; }
-    [ObservableProperty] public partial int SelectedCount { get; set; }
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(BuildBundleCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelBuildCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RefreshReposCommand))]
+    public partial bool IsBusy { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(BuildBundleCommand))]
+    public partial int SelectedCount { get; set; }
     [ObservableProperty] public partial string RepoListStatus { get; set; } = "";
 
     public string Title => "Nougat - Offline-NuGet-Bundle-Builder";
@@ -85,7 +92,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await RefreshReposAsync();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRefreshRepos))]
     public async Task RefreshReposAsync()
     {
         try
@@ -133,7 +140,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnRepoSelectionChanged(object? sender, EventArgs e)
     {
         RecalculateSelectedCount();
-        BuildBundleCommand.NotifyCanExecuteChanged();
         // Selection sofort persistieren
         var selected = Repos.Where(r => r.IsSelected).Select(r => r.FullName).ToList();
         var repos = Repos.Select(r => r.Repo).ToList();
@@ -145,6 +151,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private bool CanBuild() => !IsBusy && SelectedCount > 0;
 
+    private bool CanRefreshRepos() => !IsBusy;
+
     [RelayCommand(CanExecute = nameof(CanBuild))]
     public async Task BuildBundleAsync()
     {
@@ -152,7 +160,6 @@ public partial class MainWindowViewModel : ViewModelBase
         if (selectedRepos.Count == 0) return;
 
         IsBusy = true;
-        BuildBundleCommand.NotifyCanExecuteChanged();
         _bundleCts = new CancellationTokenSource();
         try
         {
@@ -192,6 +199,14 @@ public partial class MainWindowViewModel : ViewModelBase
                 AppendLog(LogEntry.Error(StatusText));
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Kein Fehler, sondern die Antwort auf den Abbrechen-Button. Ohne
+            // eigenen catch landete das im Exception-Zweig darunter und meldete
+            // dem Nutzer einen "unerwarteten Fehler" fuer seine eigene Aktion.
+            StatusText = "Abgebrochen.";
+            AppendLog(LogEntry.Warn(StatusText));
+        }
         catch (Exception ex)
         {
             AppendLog(LogEntry.Error("Unerwarteter Fehler: " + ex.Message));
@@ -199,8 +214,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         finally
         {
+            _bundleCts?.Dispose();
+            _bundleCts = null;
             IsBusy = false;
-            BuildBundleCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -216,8 +232,14 @@ public partial class MainWindowViewModel : ViewModelBase
         else Dispatcher.UIThread.Post(Apply);
     }
 
-    [RelayCommand]
-    public void CancelBuild() => _bundleCts?.Cancel();
+    private bool CanCancelBuild() => IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanCancelBuild))]
+    public void CancelBuild()
+    {
+        _logger.LogInformation("Bundle-Bau vom Nutzer abgebrochen.");
+        _bundleCts?.Cancel();
+    }
 
     private void AppendLog(LogEntry entry)
     {

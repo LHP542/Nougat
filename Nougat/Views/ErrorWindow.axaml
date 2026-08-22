@@ -1,0 +1,40 @@
+<chrome:ChromeWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:chrome="using:Nougat.Chrome"
+                     xmlns:ctrl="using:Nougat.Controls"
+                     x:Class="Nougat.Views.ErrorWindow"
+                     Title="Unerwarteter Fehler"
+                     Width="640" Height="440"
+                     MinWidth="480" MinHeight="320"
+                     WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource KrosteBackgroundBrush}">
+    <DockPanel>
+        <ctrl:TitleBar DockPanel.Dock="Top" Title="Unerwarteter Fehler" />
+
+        <Border DockPanel.Dock="Bottom" Classes="statusbar">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Classes="ghost" Content="Details kopieren" Click="OnCopyClick" />
+                <Button Classes="ghost" Content="Log öffnen" Click="OnOpenLogClick" />
+                <Button Classes="accent" Content="Weiterarbeiten" Click="OnCloseClick" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel Margin="24,20" Spacing="12">
+            <TextBlock Classes="h1" Text="Da ist etwas schiefgelaufen" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="Nougat läuft weiter, aber die letzte Aktion wurde abgebrochen. Der vollständige Stacktrace steht im Logfile." />
+
+            <TextBlock x:Name="MessageText" Classes="section-label" TextWrapping="Wrap" />
+
+            <Border Classes="card-flat" Height="200">
+                <ScrollViewer>
+                    <SelectableTextBlock x:Name="DetailText"
+                                         Margin="12"
+                                         FontFamily="monospace" FontSize="11"
+                                         TextWrapping="NoWrap"
+                                         Foreground="{DynamicResource KrosteMutedTextBrush}" />
+                </ScrollViewer>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</chrome:ChromeWindow>

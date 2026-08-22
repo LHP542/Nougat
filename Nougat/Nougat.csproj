@@ -19,6 +19,10 @@
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
+    <!-- Tray unter Linux: Avalonia zieht Tmds.DBus.Protocol transitiv, aber ein
+         PackageVersion ohne PackageReference pinnt NICHTS. Explizit referenzieren,
+         sonst gilt die Version aus Directory.Packages.props gar nicht. -->
+    <PackageReference Include="Tmds.DBus.Protocol" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Http" />

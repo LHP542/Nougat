@@ -1,5 +1,5 @@
-using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Nougat.Infrastructure;
 
 namespace Nougat.ViewModels;
 
@@ -18,7 +18,6 @@ public partial class InfoWindowViewModel : ViewModelBase
 
     public InfoWindowViewModel()
     {
-        var v = Assembly.GetExecutingAssembly().GetName().Version;
-        Version = "Version " + (v?.ToString(3) ?? "0.1.0");
+        Version = "Version " + AppVersion.Current;
     }
 }
