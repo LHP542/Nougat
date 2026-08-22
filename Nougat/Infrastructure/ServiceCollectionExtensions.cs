@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<BundleAssembler>();
         services.AddSingleton<NugetConfigWriter>();
         services.AddSingleton<BundleOrchestrator>();
+        services.AddSingleton<UpdateService>();
 
         // ViewModels (transient - jedes Fenster bekommt frische Instanz)
         services.AddTransient<MainWindowViewModel>();

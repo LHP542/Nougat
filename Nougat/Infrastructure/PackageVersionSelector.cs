@@ -38,6 +38,21 @@ public static class PackageVersionSelector
         return string.CompareOrdinal(normA, normB) >= 0 ? a : b;
     }
 
+    /// <summary>
+    /// Ist <paramref name="candidate"/> echt neuer als <paramref name="current"/>?
+    /// Für den Update-Check: Ein Prerelease gilt nach SemVer als älter als das
+    /// gleichnamige Release, "0.2.0-alpha.1" löst also kein Update auf "0.2.0" aus.
+    /// </summary>
+    public static bool IsNewer(string candidate, string current)
+    {
+        if (string.IsNullOrWhiteSpace(candidate)) return false;
+        if (string.IsNullOrWhiteSpace(current)) return true;
+        if (string.Equals(candidate, current, StringComparison.OrdinalIgnoreCase)) return false;
+
+        var higher = PickHigher(candidate, current);
+        return ReferenceEquals(higher, candidate) || string.Equals(higher, candidate, StringComparison.Ordinal);
+    }
+
     /// <summary>Wandelt NuGet-Range-Notation "[1.0,2.0)" in die untere Grenze um.</summary>
     private static string Normalize(string version)
     {

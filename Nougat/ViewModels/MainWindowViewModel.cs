@@ -28,6 +28,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly BundleOrchestrator _orchestrator;
     private readonly DotnetSdkService _sdk;
     private readonly SettingsService _settingsService;
+    private readonly UpdateService _updates;
     private readonly AppSettings _settings;
     private readonly ILogger<MainWindowViewModel> _logger;
 
@@ -59,6 +60,7 @@ public partial class MainWindowViewModel : ViewModelBase
         DotnetSdkService sdk,
         SettingsService settingsService,
         AppSettings settings,
+        UpdateService updates,
         ILogger<MainWindowViewModel> logger)
     {
         _github = github;
@@ -67,12 +69,14 @@ public partial class MainWindowViewModel : ViewModelBase
         _sdk = sdk;
         _settingsService = settingsService;
         _settings = settings;
+        _updates = updates;
         _logger = logger;
 
         OutputDirectory = _settings.OutputDirectory;
 
         // Beim Start: Cache lesen, dann im Hintergrund refresh.
         _ = LoadInitialAsync();
+        _ = CheckForUpdateAsync();
     }
 
     private async Task LoadInitialAsync()
@@ -90,6 +94,28 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // Hintergrund-Refresh
         await RefreshReposAsync();
+    }
+
+    /// <summary>
+    /// Update-Check beim Start — nicht blockierend und ohne Fehlerdialog. Ist der
+    /// Rechner offline oder der Proxy zickig, steht davon nur eine Zeile im Log.
+    /// Installiert wird hier nichts: Das passiert erst auf Klick im Über-Fenster.
+    /// </summary>
+    private async Task CheckForUpdateAsync()
+    {
+        var result = await _updates.CheckAsync();
+        if (result.Error is not null)
+        {
+            _logger.LogDebug("Update-Check beim Start ohne Ergebnis: {Error}", result.Error);
+            return;
+        }
+
+        if (result.UpdateAvailable)
+        {
+            AppendLog(LogEntry.Info(
+                $"Version {result.LatestVersion} ist verfügbar (installiert: {result.CurrentVersion}). "
+                + "Installieren über Menü \u203a Über."));
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanRefreshRepos))]
