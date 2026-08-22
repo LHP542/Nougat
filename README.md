@@ -1,7 +1,10 @@
 # Nougat
 
-[![CI](https://github.com/Kroste/Nougat/actions/workflows/ci.yml/badge.svg)](https://github.com/Kroste/Nougat/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Kroste/Nougat)](https://github.com/Kroste/Nougat/releases)
+> Projekt der **Arbeitsgruppe 5424 IT-Basis-Dienste** der Landeshauptstadt Potsdam.
+> Alle dienstlichen Repos liegen in der GitHub-Organisation [LHP542](https://github.com/LHP542).
+
+[![CI](https://github.com/LHP542/Nougat/actions/workflows/ci.yml/badge.svg)](https://github.com/LHP542/Nougat/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/LHP542/Nougat)](https://github.com/LHP542/Nougat/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Offline-NuGet-Bundle-Builder fuer Kroste-Repos — Desktop-App fuer Windows und Linux (C# / .NET 10 / Avalonia 12).
@@ -22,7 +25,7 @@ Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine
 
 ## Installation
 
-Fertige Pakete gibt es auf der [Releases-Seite](https://github.com/Kroste/Nougat/releases):
+Fertige Pakete gibt es auf der [Releases-Seite](https://github.com/LHP542/Nougat/releases):
 
 **Windows:** `Nougat-X.Y.Z-win-x64.zip` herunterladen, entpacken, `Nougat.exe` starten. Keine Installation noetig (self-contained, .NET ist enthalten).
 

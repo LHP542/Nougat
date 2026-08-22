@@ -15,6 +15,14 @@ namespace Nougat.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    /// <summary>
+    /// GitHub-Konto, dessen Repos zur Auswahl stehen. Seit dem Umzug der
+    /// dienstlichen Projekte die Organisation <c>LHP542</c> statt des
+    /// persoenlichen Kontos — sonst listet Nougat die privaten Repos und
+    /// findet genau die nicht, fuer die das Offline-Bundle gebaut wird.
+    /// </summary>
+    private const string GithubAccount = "LHP542";
+
     private readonly GithubRepoService _github;
     private readonly RepoCacheService _cache;
     private readonly BundleOrchestrator _orchestrator;
@@ -88,13 +96,13 @@ public partial class MainWindowViewModel : ViewModelBase
                 Repos.Where(r => r.IsSelected).Select(r => r.FullName),
                 StringComparer.OrdinalIgnoreCase);
 
-            var list = await _github.ListUserReposAsync("Kroste");
+            var list = await _github.ListUserReposAsync(GithubAccount);
             list = list.Where(r => _settings.ShowArchivedRepos || !r.IsArchived).ToList();
             list = list.OrderBy(r => r.Name, StringComparer.OrdinalIgnoreCase).ToList();
 
             PopulateFromCache(list, previouslySelected);
             _cache.Save(list, previouslySelected);
-            RepoListStatus = $"{list.Count} Repos geladen (Kroste)";
+            RepoListStatus = $"{list.Count} Repos geladen ({GithubAccount})";
             AppendLog(LogEntry.Info($"{list.Count} Repos aktualisiert"));
         }
         catch (GithubRateLimitedException ex)

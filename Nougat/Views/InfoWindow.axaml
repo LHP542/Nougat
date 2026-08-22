@@ -33,6 +33,8 @@
                        Foreground="{DynamicResource KrosteGoldBrush}" />
             <TextBlock Text="{Binding Version}"
                        Foreground="{DynamicResource KrosteMutedBrush}" />
+            <TextBlock Text="{Binding Organisation}"
+                       Foreground="White" FontWeight="SemiBold" />
             <TextBlock Text="{Binding Description}"
                        Foreground="White" TextWrapping="Wrap" />
         </StackPanel>

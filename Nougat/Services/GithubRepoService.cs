@@ -50,14 +50,44 @@ public sealed class GithubRepoService
         _logger = logger;
     }
 
-    public async Task<List<RepoInfo>> ListUserReposAsync(string userName, CancellationToken ct = default)
+    /// <summary>
+    /// Listet die Repos eines Kontos. <paramref name="account"/> darf ein
+    /// Benutzer <b>oder</b> eine Organisation sein.
+    ///
+    /// <para>Der Unterschied steckt im Endpunkt: <c>/orgs/{name}/repos</c>
+    /// liefert bei einer Organisation auch die <b>privaten</b> Repos, auf die
+    /// das Token Zugriff hat; <c>/users/{name}/repos</c> gibt dort nur die
+    /// oeffentlichen zurueck. Fuer ein Offline-Bundle aus dienstlichen — also
+    /// meist privaten — Repos ist das der Unterschied zwischen „alles" und
+    /// „fast nichts". Deshalb erst <c>/orgs/</c> versuchen und nur bei 404 auf
+    /// <c>/users/</c> zurueckfallen.</para>
+    /// </summary>
+    public async Task<List<RepoInfo>> ListUserReposAsync(string account, CancellationToken ct = default)
+    {
+        // Achtung, die beiden Endpunkte kennen verschiedene type-Werte:
+        // /orgs/ akzeptiert all|public|private|forks|sources|member,
+        // /users/ dagegen all|owner|member. Ein "type=owner" an /orgs/
+        // quittiert GitHub mit 422 — deshalb steht die Query beim Endpunkt und
+        // nicht in der gemeinsamen Schleife.
+        var fromOrg = await ListFromAsync($"{ApiRoot}/orgs/{account}/repos", "all", account, ct)
+            .ConfigureAwait(false);
+        if (fromOrg is not null) return fromOrg;
+
+        return await ListFromAsync($"{ApiRoot}/users/{account}/repos", "owner", account, ct)
+            .ConfigureAwait(false) ?? [];
+    }
+
+    /// <summary>Liest eine Repo-Liste seitenweise. <c>null</c> = Konto unter
+    /// diesem Endpunkt unbekannt (404); der Aufrufer versucht dann den anderen.</summary>
+    private async Task<List<RepoInfo>?> ListFromAsync(string endpoint, string type,
+        string account, CancellationToken ct)
     {
         var result = new List<RepoInfo>();
         var client = _factory.CreateClient(HttpClientName);
 
         for (var page = 1; ; page++)
         {
-            var url = $"{ApiRoot}/users/{userName}/repos?per_page=100&type=owner&page={page}";
+            var url = $"{endpoint}?per_page=100&type={type}&page={page}";
             using var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
 
@@ -71,6 +101,11 @@ public sealed class GithubRepoService
                         throw new GithubRateLimitedException(
                             "GitHub-API-Rate-Limit erreicht. PAT in den Einstellungen setzen erhoeht das Limit auf 5000/h.");
             }
+
+            // 404 heisst nur „unter diesem Endpunkt nicht bekannt" — dann ist
+            // das Konto eben kein Org bzw. kein User. Kein Fehler, der dem
+            // Anwender gezeigt werden muesste.
+            if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
 
             if (!resp.IsSuccessStatusCode)
             {
@@ -86,7 +121,8 @@ public sealed class GithubRepoService
             if (pageItems.Count < 100) break;
         }
 
-        _logger.LogInformation("GitHub: {Count} Repos fuer User {User} geladen", result.Count, userName);
+        _logger.LogInformation("GitHub: {Count} Repos fuer {Account} geladen ({Endpoint})",
+            result.Count, account, endpoint);
         return result;
     }
 
