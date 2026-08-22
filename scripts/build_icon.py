@@ -13,7 +13,7 @@ Erzeugt:
 from PIL import Image, ImageDraw
 
 GOLD     = (224, 177, 76, 255)     # #E0B14C
-GOLD_D   = (176, 138, 55, 255)     # dunkler fuer Schatten
+GOLD_D   = (176, 138, 55, 255)     # dunkler für Schatten
 SURFACE  = (22, 28, 35, 255)       # #161C23
 BORDER   = (42, 51, 61, 255)       # #2A333D
 TRANSP   = (0, 0, 0, 0)

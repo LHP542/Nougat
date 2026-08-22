@@ -2,7 +2,7 @@
 # =============================================================================
 #  nuget-offline-bundle.sh
 # -----------------------------------------------------------------------------
-#  Erzeugt ein Offline-NuGet-Bundle fuer das DTM-Projekt
+#  Erzeugt ein Offline-NuGet-Bundle für das DTM-Projekt
 #  (Avalonia 11.2.3 + .NET 10, Build-Ziel Windows / win-x64).
 #
 #  Laufzielsystem:  Bazzite / Fedora Atomic (immutable)
@@ -10,13 +10,13 @@
 #                   - Anker-csproj mit allen PackageReferences erzeugen
 #                   - dotnet restore (managed + runtime win-x64)
 #                   - alle .nupkg flach nach ~/nuget-offline-work/NuGet-Local kopieren
-#                   - passende nuget.config fuer die Windows-Seite mitliefern
+#                   - passende nuget.config für die Windows-Seite mitliefern
 #
 #  Bedienung:
 #      chmod +x nuget-offline-bundle.sh
 #      ./nuget-offline-bundle.sh
 #
-#  Ergebnis liegt anschliessend in:
+#  Ergebnis liegt anschließend in:
 #      ~/nuget-offline-work/NuGet-Local/
 #  Dort liegen alle .nupkg + nuget.config.windows + README.txt.
 #  Diesen Ordnerinhalt 1:1 auf den Windows-Rechner nach C:\NuGet-Local kopieren.
@@ -42,7 +42,7 @@ err()  { echo -e "${C_R}[x]${C_0} $*" >&2; }
 step() { echo; echo -e "${C_B}==== $* ====${C_0}"; }
 
 # --- 1) .NET 10 SDK sicherstellen --------------------------------------------
-step "1/5  .NET 10 SDK pruefen / installieren"
+step "1/5  .NET 10 SDK prüfen / installieren"
 
 ensure_dotnet() {
     # bereits im PATH und passende Version?
@@ -76,12 +76,12 @@ ensure_dotnet() {
     export DOTNET_ROOT="${DOTNET_DIR}"
     ok "Installiert: $(${DOTNET_BIN} --version)"
 
-    info "Tipp: dauerhaft verfuegbar machen mit:"
+    info "Tipp: dauerhaft verfügbar machen mit:"
     echo "      echo 'export PATH=\"\$HOME/.dotnet:\$PATH\"' >> ~/.bashrc"
     echo "      echo 'export DOTNET_ROOT=\"\$HOME/.dotnet\"'   >> ~/.bashrc"
 }
 
-# Telemetrie aus, EULA bestaetigen (laeuft sonst interaktiv)
+# Telemetrie aus, EULA bestätigen (läuft sonst interaktiv)
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1
 
@@ -135,7 +135,7 @@ cat > "${ANCHOR}" <<'CSPROJ'
 </Project>
 CSPROJ
 
-# nuget.config NUR fuer den Anker-Restore (nuget.org erlaubt, kein <clear/> der den Online-Zugriff blockt)
+# nuget.config NUR für den Anker-Restore (nuget.org erlaubt, kein <clear/> der den Online-Zugriff blockt)
 cat > "${WORK_DIR}/nuget.config" <<'NUGET'
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -172,7 +172,7 @@ done
 popd >/dev/null
 ok "Hierarchischer Cache fertig unter: ${OUT_HIER}"
 
-# --- 4) Flachen NuGet-Feed fuer den Windows-Rechner zusammenstellen ----------
+# --- 4) Flachen NuGet-Feed für den Windows-Rechner zusammenstellen ----------
 step "4/5  Flachen Feed (.nupkg-Sammlung) erzeugen"
 
 rm -rf "${OUT_FLAT}"
@@ -191,7 +191,7 @@ NUPKG_COUNT=$(find "${OUT_FLAT}" -maxdepth 1 -name '*.nupkg' | wc -l)
 TOTAL_SIZE=$(du -sh "${OUT_FLAT}" | awk '{print $1}')
 ok "${NUPKG_COUNT} Pakete (${TOTAL_SIZE}) in ${OUT_FLAT}"
 
-# nuget.config fuer die Windows-Seite mit dazu legen
+# nuget.config für die Windows-Seite mit dazu legen
 cat > "${OUT_FLAT}/nuget.config.windows" <<'NUGET'
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -214,34 +214,34 @@ NUGET
 
 # Kleine README
 cat > "${OUT_FLAT}/README.txt" <<README
-Offline-NuGet-Bundle fuer DTM (Avalonia 11.2.3 / .NET 10 / Windows)
+Offline-NuGet-Bundle für DTM (Avalonia 11.2.3 / .NET 10 / Windows)
 =====================================================================
 Generiert am: $(date)
 Pakete:       ${NUPKG_COUNT}
-Groesse:      ${TOTAL_SIZE}
+Größe:      ${TOTAL_SIZE}
 
-Schritt 1 - Uebertragen
+Schritt 1 - Übertragen
 -----------------------
 Den KOMPLETTEN Inhalt dieses Ordners (alle *.nupkg + nuget.config.windows)
 auf den Windows-Rechner nach C:\NuGet-Local kopieren.
-Bestehende gleichnamige Dateien koennen ueberschrieben werden.
+Bestehende gleichnamige Dateien können überschrieben werden.
 
 Schritt 2 - nuget.config aktivieren
 -----------------------------------
 Die Datei "nuget.config.windows" auf dem Windows-Rechner umbenennen zu
 "nuget.config" und entweder
-  a) neben die DTM.sln legen (gilt nur fuer dieses Projekt), oder
+  a) neben die DTM.sln legen (gilt nur für dieses Projekt), oder
   b) nach %APPDATA%\NuGet\NuGet.Config kopieren (gilt benutzerweit).
 
 Schritt 3 - Audit deaktivieren (.NET 10)
 ----------------------------------------
-In DTM.csproj oder einer Directory.Build.props zusaetzlich setzen:
+In DTM.csproj oder einer Directory.Build.props zusätzlich setzen:
   <PropertyGroup>
     <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
-Hintergrund: .NET 10 prueft transitive Pakete per Default gegen einen
-Online-Vulnerability-Feed. Offline fuehrt das zu NU1900/NU1901-Fehlern.
+Hintergrund: .NET 10 prüft transitive Pakete per Default gegen einen
+Online-Vulnerability-Feed. Offline führt das zu NU1900/NU1901-Fehlern.
 
 Schritt 4 - Cache leeren + restore
 ----------------------------------
@@ -254,9 +254,9 @@ README
 step "5/5  Fertig"
 ok "Quelle (hierarchischer Cache):  ${OUT_HIER}"
 ok "ZIEL  (flach -> C:\\NuGet-Local): ${OUT_FLAT}"
-ok "Pakete: ${NUPKG_COUNT}   Gesamtgroesse: ${TOTAL_SIZE}"
+ok "Pakete: ${NUPKG_COUNT}   Gesamtgröße: ${TOTAL_SIZE}"
 echo
-info "Naechste Schritte:"
+info "Nächste Schritte:"
 echo "  1) Inhalt von ${OUT_FLAT} auf USB / Share kopieren"
 echo "  2) Auf dem Windows-Rechner nach C:\\NuGet-Local entpacken"
 echo "  3) nuget.config.windows -> nuget.config umbenennen"

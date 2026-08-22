@@ -9,9 +9,9 @@ using Nougat.Models;
 namespace Nougat.Services;
 
 /// <summary>
-/// Extrahiert PackageReferences aus einem Repo. Unterstuetzt Central Package Management:
+/// Extrahiert PackageReferences aus einem Repo. Unterstützt Central Package Management:
 /// wenn eine PackageReference keine Version tragt, wird sie aus der
-/// Directory.Packages.props (PackageVersion) desselben Repos ergaenzt.
+/// Directory.Packages.props (PackageVersion) desselben Repos ergänzt.
 /// </summary>
 public sealed class CsprojAnalyzer
 {
@@ -40,7 +40,7 @@ public sealed class CsprojAnalyzer
                 cpmPaths.Add(p);
         }
 
-        // CPM-Version-Map ueber alle Directory.Packages.props zusammenfuehren
+        // CPM-Version-Map über alle Directory.Packages.props zusammenführen
         var cpmVersions = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
         foreach (var cpm in cpmPaths)
         {

@@ -11,8 +11,8 @@ namespace Nougat.Services;
 
 /// <summary>
 /// NLog-Wrapper, der bekannte Secret-Werte in Log-Zeilen durch "***MASKED***" ersetzt.
-/// Registriert wird der Renderer beim Programmstart, Werte werden ueber
-/// <see cref="Register"/> hinzugefuegt bzw. per <see cref="Unregister"/> entfernt.
+/// Registriert wird der Renderer beim Programmstart, Werte werden über
+/// <see cref="Register"/> hinzugefügt bzw. per <see cref="Unregister"/> entfernt.
 /// </summary>
 [LayoutRenderer("masked")]
 [ThreadAgnostic]

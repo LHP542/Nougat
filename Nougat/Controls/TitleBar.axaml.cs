@@ -5,7 +5,7 @@ using Avalonia.Input;
 namespace Nougat.Controls;
 
 /// <summary>
-/// Kroste-Standard-Titelleiste fuer Fenster mit SystemDecorations="BorderOnly":
+/// Kroste-Standard-Titelleiste für Fenster mit SystemDecorations="BorderOnly":
 /// Drag zum Verschieben, Doppelklick zum Maximieren, eigene Min/Max/Close-Buttons.
 /// </summary>
 public partial class TitleBar : UserControl

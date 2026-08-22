@@ -11,7 +11,7 @@ using Nougat.Models;
 namespace Nougat.Services;
 
 /// <summary>
-/// Fassade fuer den kompletten Bundle-Bau: Analyze -> Dedup -> SDK-Check -> Anchor
+/// Fassade für den kompletten Bundle-Bau: Analyze -> Dedup -> SDK-Check -> Anchor
 /// -> Restore -> Assemble -> Configs. Fortschritt via IProgress an das UI.
 /// </summary>
 public sealed class BundleOrchestrator
@@ -48,7 +48,7 @@ public sealed class BundleOrchestrator
         _logger = logger;
     }
 
-    /// <summary>Fuehrt den kompletten Bundle-Lauf aus. Wirft nur bei fatalen Fehlern.</summary>
+    /// <summary>Führt den kompletten Bundle-Lauf aus. Wirft nur bei fatalen Fehlern.</summary>
     public async Task<BundleResult> BuildAsync(
         BundleConfig config,
         IReadOnlyDictionary<string, string> repoBranchMap,
@@ -62,9 +62,9 @@ public sealed class BundleOrchestrator
 
         try
         {
-            Report(progress, BundlePhase.CheckingSdk, 0.02, "Pruefe .NET-SDK");
+            Report(progress, BundlePhase.CheckingSdk, 0.02, "Prüfe .NET-SDK");
             if (!File.Exists(dotnetPath))
-                return Fail(sw, "Kein .NET-SDK verfuegbar. Bitte in den Einstellungen installieren.");
+                return Fail(sw, "Kein .NET-SDK verfügbar. Bitte in den Einstellungen installieren.");
 
             Report(progress, BundlePhase.Analyzing, 0.05, "Analysiere Repos ...");
             var perRepo = await AnalyzeAllAsync(config.SelectedRepos, repoBranchMap, progress, ct).ConfigureAwait(false);
@@ -96,7 +96,7 @@ public sealed class BundleOrchestrator
                 ct: ct
             ).ConfigureAwait(false);
             if (!restored)
-                return Fail(sw, "dotnet restore fehlgeschlagen. Log oben pruefen.");
+                return Fail(sw, "dotnet restore fehlgeschlagen. Log oben prüfen.");
 
             Report(progress, BundlePhase.Assembling, 0.85, "Kopiere .nupkg in Zielordner");
             var assemble = _assembler.Assemble(hierCache, config.OutputDirectory,

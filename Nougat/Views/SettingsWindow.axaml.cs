@@ -5,7 +5,7 @@ namespace Nougat.Views;
 
 public partial class SettingsWindow : ChromeWindow
 {
-    // Parameterloser Ctor fuer den XAML-Loader (Design-Time).
+    // Parameterloser Ctor für den XAML-Loader (Design-Time).
     public SettingsWindow()
     {
         InitializeComponent();

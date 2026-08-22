@@ -32,7 +32,7 @@
                          Background="{DynamicResource KrosteSurfaceBrush}"
                          Foreground="White"
                          PlaceholderText="ghp_..." />
-                <TextBlock Text="Ohne PAT: 60 API-Requests pro Stunde. Mit PAT: 5000/h. Wird verschluesselt gespeichert."
+                <TextBlock Text="Ohne PAT: 60 API-Requests pro Stunde. Mit PAT: 5000/h. Wird verschlüsselt gespeichert."
                            Foreground="{DynamicResource KrosteMutedBrush}"
                            TextWrapping="Wrap" FontSize="11" />
 
@@ -54,7 +54,7 @@
 
                 <Separator Background="#22262B" />
 
-                <TextBlock Text="Target-RIDs (fuer dotnet restore --runtime)"
+                <TextBlock Text="Target-RIDs (für dotnet restore --runtime)"
                            Foreground="{DynamicResource KrosteGoldBrush}"
                            FontWeight="SemiBold" />
                 <StackPanel Orientation="Horizontal" Spacing="16">

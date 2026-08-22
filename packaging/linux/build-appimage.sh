@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Baut das AppImage aus einem fertigen linux-x64-Publish-Ordner (Kroste-Standard).
 # Aufruf: packaging/linux/build-appimage.sh <version> <publish-dir>
-# Hinweis: --appimage-extract-and-run ist noetig, weil im CI kein FUSE verfuegbar ist.
+# Hinweis: --appimage-extract-and-run ist nötig, weil im CI kein FUSE verfügbar ist.
 set -euo pipefail
 
 VERSION="$1"

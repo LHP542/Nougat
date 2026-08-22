@@ -8,8 +8,8 @@ on:
 permissions:
   contents: write
 
-# Muster aus Amtsschimmel (bewaehrt): native Builds pro OS mit Tests,
-# Linux zusaetzlich als AppImage, Release-Job sammelt die Artefakte ein.
+# Muster aus Amtsschimmel (bewährt): native Builds pro OS mit Tests,
+# Linux zusätzlich als AppImage, Release-Job sammelt die Artefakte ein.
 jobs:
   build-windows:
     runs-on: windows-latest

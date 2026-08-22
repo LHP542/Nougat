@@ -9,7 +9,7 @@ namespace Nougat.Services;
 
 /// <summary>
 /// Persistiert die Repo-Liste + Selektion unter ~/.config/Nougat/repos.cache.json.
-/// TTL wird vom Aufrufer geprueft — dieser Service kennt kein Zeitfenster,
+/// TTL wird vom Aufrufer geprüft — dieser Service kennt kein Zeitfenster,
 /// er speichert/liefert nur den Cache.
 /// </summary>
 public sealed class RepoCacheService

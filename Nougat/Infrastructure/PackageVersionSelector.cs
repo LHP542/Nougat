@@ -4,7 +4,7 @@ using Semver;
 namespace Nougat.Infrastructure;
 
 /// <summary>
-/// Vergleicht zwei Paket-Version-Strings und liefert die "hoehere". Reihenfolge der Versuche:
+/// Vergleicht zwei Paket-Version-Strings und liefert die "höhere". Reihenfolge der Versuche:
 /// 1) SemVer 2.0 (Semver-NuGet-Paket) — deckt "1.2.3-preview.1+build" ab.
 /// 2) NuGet-Range mit eckigen Klammern "[7.2.2,8.0.0)" — untere Grenze verwenden.
 /// 3) System.Version — vier Segmente wie "10.0.7".
@@ -12,7 +12,7 @@ namespace Nougat.Infrastructure;
 /// </summary>
 public static class PackageVersionSelector
 {
-    /// <summary>Waehlt aus zwei Versions-Strings den "hoeheren".</summary>
+    /// <summary>Wählt aus zwei Versions-Strings den "höheren".</summary>
     public static string PickHigher(string a, string b)
     {
         if (string.IsNullOrWhiteSpace(a)) return b;

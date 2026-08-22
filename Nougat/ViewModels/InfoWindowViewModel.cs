@@ -12,8 +12,8 @@ public partial class InfoWindowViewModel : ViewModelBase
     public string Organisation => "Arbeitsgruppe 5424 IT-Basis-Dienste";
 
     public string Description =>
-        "Offline-NuGet-Bundle-Builder fuer die Repos der GitHub-Organisation LHP542.\n" +
-        "Waehle Repos aus, Nougat sammelt PackageReferences, fuehrt dotnet restore aus\n" +
+        "Offline-NuGet-Bundle-Builder für die Repos der GitHub-Organisation LHP542.\n" +
+        "Wähle Repos aus, Nougat sammelt PackageReferences, führt dotnet restore aus\n" +
         "und schreibt einen NuGet-Local-Ordner (analog zu nuget-offline-bundle.sh).";
 
     public InfoWindowViewModel()

@@ -22,7 +22,7 @@
         <!-- Titelleiste -->
         <ctrl:TitleBar DockPanel.Dock="Top" Title="{Binding Title}" />
 
-        <!-- Menuebar -->
+        <!-- Menüleiste -->
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource KrosteTitleBarBrush}"
                 BorderThickness="0,0,0,1"
@@ -32,7 +32,7 @@
                         Background="Transparent" Foreground="White" Padding="12,6" />
                 <Button Content=".NET SDK installieren" Classes="menu" Click="OnInstallSdkClick"
                         Background="Transparent" Foreground="White" Padding="12,6" />
-                <Button Content="Ueber" Classes="menu" Click="OnAboutClick"
+                <Button Content="Über" Classes="menu" Click="OnAboutClick"
                         Background="Transparent" Foreground="White" Padding="12,6" />
             </StackPanel>
         </Border>

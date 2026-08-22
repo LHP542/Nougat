@@ -24,7 +24,7 @@ public sealed class BundleAssembler
     {
         if (Directory.Exists(outputDirectory))
         {
-            _logger.LogDebug("Loesche Zielordner {Dir}", outputDirectory);
+            _logger.LogDebug("Lösche Zielordner {Dir}", outputDirectory);
             Directory.Delete(outputDirectory, recursive: true);
         }
         Directory.CreateDirectory(outputDirectory);
@@ -46,7 +46,7 @@ public sealed class BundleAssembler
         }
 
         onProgress?.Invoke(count);
-        _logger.LogInformation("Zielordner bestueckt: {Count} Pakete, {SizeMB:F1} MB", count, size / 1024.0 / 1024.0);
+        _logger.LogInformation("Zielordner bestückt: {Count} Pakete, {SizeMB:F1} MB", count, size / 1024.0 / 1024.0);
         return new AssembleResult(count, size);
     }
 }

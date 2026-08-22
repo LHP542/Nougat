@@ -25,7 +25,7 @@ public sealed class SettingsService
     public SettingsService(ILogger<SettingsService> logger)
         : this(logger, PathProvider.SettingsFilePath) { }
 
-    // Fuer Tests: eigener Pfad
+    // Für Tests: eigener Pfad
     public SettingsService(ILogger<SettingsService> logger, string path)
     {
         _logger = logger;

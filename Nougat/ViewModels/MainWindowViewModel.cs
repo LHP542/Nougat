@@ -18,8 +18,8 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// GitHub-Konto, dessen Repos zur Auswahl stehen. Seit dem Umzug der
     /// dienstlichen Projekte die Organisation <c>LHP542</c> statt des
-    /// persoenlichen Kontos — sonst listet Nougat die privaten Repos und
-    /// findet genau die nicht, fuer die das Offline-Bundle gebaut wird.
+    /// persönlichen Kontos — sonst listet Nougat die privaten Repos und
+    /// findet genau die nicht, für die das Offline-Bundle gebaut wird.
     /// </summary>
     private const string GithubAccount = "LHP542";
 

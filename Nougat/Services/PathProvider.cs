@@ -46,7 +46,7 @@ public static class PathProvider
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                      "nuget-offline-work", "NuGet-Local");
 
-    /// <summary>Eigener SDK-Installationspfad (nicht ~/.dotnet ueberschreiben!).</summary>
+    /// <summary>Eigener SDK-Installationspfad (nicht ~/.dotnet überschreiben!).</summary>
     public static string ManagedDotnetDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".dotnet-nougat");
 

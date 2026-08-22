@@ -15,7 +15,7 @@ public enum SdkStatus { OnPath, ManagedInstall, Missing }
 public sealed record SdkProbe(SdkStatus Status, string? ExecutablePath, string? Version);
 
 /// <summary>
-/// Prueft ob ein passendes .NET-10-SDK verfuegbar ist. Wenn nicht, kann das
+/// Prüft ob ein passendes .NET-10-SDK verfügbar ist. Wenn nicht, kann das
 /// SDK per dotnet-install-Skript nach <see cref="PathProvider.ManagedDotnetDirectory"/>
 /// gebootstrapt werden — bewusst nicht ~/.dotnet, damit das globale SDK unangetastet bleibt.
 /// </summary>
@@ -71,7 +71,7 @@ public sealed class DotnetSdkService
         return new SdkProbe(SdkStatus.Missing, null, null);
     }
 
-    /// <summary>Laedt und startet dotnet-install; installiert SDK 10 nach ManagedDotnetDirectory.</summary>
+    /// <summary>Lädt und startet dotnet-install; installiert SDK 10 nach ManagedDotnetDirectory.</summary>
     public async Task<string> InstallAsync(
         string channel,
         IProgress<double>? progress,
@@ -171,7 +171,7 @@ public sealed class DotnetSdkService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Konnte SDK-Version fuer {Path} nicht ermitteln", dotnetPath);
+            _logger.LogWarning(ex, "Konnte SDK-Version für {Path} nicht ermitteln", dotnetPath);
             return null;
         }
     }

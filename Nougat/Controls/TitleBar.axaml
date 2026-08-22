@@ -3,11 +3,11 @@
              xmlns:chrome="using:Avalonia.Controls.Chrome"
              x:Class="Nougat.Controls.TitleBar"
              Height="36">
-    <!-- ElementRole ist der Avalonia-12-Mechanismus fuer Custom-Chrome-Hit-Testing:
-         TitleBar = OS uebernimmt Drag + Doppelklick-Maximieren nativ (HTCAPTION).
+    <!-- ElementRole ist der Avalonia-12-Mechanismus für Custom-Chrome-Hit-Testing:
+         TitleBar = OS übernimmt Drag + Doppelklick-Maximieren nativ (HTCAPTION).
          Buttons = Rolle "User" (HTCLIENT): Klicks laufen als normale Client-
          Eingabe direkt zu den Avalonia-Buttons. NICHT MinimizeButton/
-         MaximizeButton/CloseButton verwenden — diese Rollen leiten ueber den
+         MaximizeButton/CloseButton verwenden — diese Rollen leiten über den
          Non-Client-Pfad, wo DWM die Klicks schlucken kann. -->
     <Border x:Name="Bar"
             Background="{DynamicResource KrosteTitleBarBrush}"

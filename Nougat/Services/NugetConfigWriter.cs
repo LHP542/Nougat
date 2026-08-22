@@ -55,7 +55,7 @@ public sealed class NugetConfigWriter
         sb.AppendLine();
         sb.AppendLine($"Erzeugt am: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
         sb.AppendLine($"Pakete:     {packageCount}");
-        sb.AppendLine($"Groesse:    {totalSizeBytes / 1024.0 / 1024.0:F1} MB");
+        sb.AppendLine($"Größe:    {totalSizeBytes / 1024.0 / 1024.0:F1} MB");
         sb.AppendLine();
         sb.AppendLine("Einbezogene Repos:");
         foreach (var r in includedRepos)
@@ -64,11 +64,11 @@ public sealed class NugetConfigWriter
 
         if (conflicts.Count > 0)
         {
-            sb.AppendLine("Version-Konflikte (hoechste Version gewaehlt):");
+            sb.AppendLine("Version-Konflikte (höchste Version gewählt):");
             foreach (var c in conflicts.OrderBy(c => c.PackageId, StringComparer.OrdinalIgnoreCase))
             {
                 sb.AppendLine($"  {c.PackageId}");
-                sb.AppendLine($"    gewaehlt:  {c.ChosenVersion}  <- {string.Join(", ", c.ChosenRepos)}");
+                sb.AppendLine($"    gewählt:  {c.ChosenVersion}  <- {string.Join(", ", c.ChosenRepos)}");
                 foreach (var d in c.DiscardedSources)
                     sb.AppendLine($"    verworfen: {d.Version}  <- {string.Join(", ", d.Repos)}");
             }

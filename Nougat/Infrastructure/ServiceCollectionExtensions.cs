@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         // Secrets
         services.AddSingleton<ISecretStore, LinuxAesGcmSecretStore>();
 
-        // HttpClient fuer GitHub (User-Agent, Proxy, PAT)
+        // HttpClient für GitHub (User-Agent, Proxy, PAT)
         services.AddGithubHttpClient();
 
         // Kern-Services

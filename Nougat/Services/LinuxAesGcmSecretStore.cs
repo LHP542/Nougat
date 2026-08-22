@@ -6,7 +6,7 @@ using System.Text;
 namespace Nougat.Services;
 
 /// <summary>
-/// Datei-basierter Secret-Store fuer Linux/macOS: AES-GCM mit lokalem Master-Key
+/// Datei-basierter Secret-Store für Linux/macOS: AES-GCM mit lokalem Master-Key
 /// unter ~/.config/Nougat/protect.key (Modus 0600). Nicht so stark wie DPAPI oder
 /// libsecret, aber deutlich besser als Klartext und kommt ohne DBus-Dependency aus.
 /// Prefix "ENC1:" markiert den Chiffre-String.
@@ -99,7 +99,7 @@ public sealed class LinuxAesGcmSecretStore : ISecretStore
         }
         catch
         {
-            // Best-effort - Filesystem unterstuetzt evtl. keine POSIX-Modi.
+            // Best-effort - Filesystem unterstützt evtl. keine POSIX-Modi.
         }
     }
 }

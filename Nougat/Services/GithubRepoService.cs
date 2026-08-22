@@ -25,7 +25,7 @@ public sealed class GithubRateLimitedException : GithubApiException
 }
 
 /// <summary>
-/// Duennschichtiger Wrapper um die GitHub REST-API.
+/// Dünnschichtiger Wrapper um die GitHub REST-API.
 /// Named HttpClient "github" liefert User-Agent, System-Proxy und optional das Bearer-Token.
 /// </summary>
 public sealed class GithubRepoService
@@ -57,10 +57,10 @@ public sealed class GithubRepoService
     /// <para>Der Unterschied steckt im Endpunkt: <c>/orgs/{name}/repos</c>
     /// liefert bei einer Organisation auch die <b>privaten</b> Repos, auf die
     /// das Token Zugriff hat; <c>/users/{name}/repos</c> gibt dort nur die
-    /// oeffentlichen zurueck. Fuer ein Offline-Bundle aus dienstlichen — also
+    /// öffentlichen zurück. Für ein Offline-Bundle aus dienstlichen — also
     /// meist privaten — Repos ist das der Unterschied zwischen „alles" und
     /// „fast nichts". Deshalb erst <c>/orgs/</c> versuchen und nur bei 404 auf
-    /// <c>/users/</c> zurueckfallen.</para>
+    /// <c>/users/</c> zurückfallen.</para>
     /// </summary>
     public async Task<List<RepoInfo>> ListUserReposAsync(string account, CancellationToken ct = default)
     {
@@ -99,12 +99,12 @@ public sealed class GithubRepoService
                 foreach (var v in vals)
                     if (v == "0")
                         throw new GithubRateLimitedException(
-                            "GitHub-API-Rate-Limit erreicht. PAT in den Einstellungen setzen erhoeht das Limit auf 5000/h.");
+                            "GitHub-API-Rate-Limit erreicht. PAT in den Einstellungen setzen erhöht das Limit auf 5000/h.");
             }
 
-            // 404 heisst nur „unter diesem Endpunkt nicht bekannt" — dann ist
+            // 404 heißt nur „unter diesem Endpunkt nicht bekannt" — dann ist
             // das Konto eben kein Org bzw. kein User. Kein Fehler, der dem
-            // Anwender gezeigt werden muesste.
+            // Anwender gezeigt werden müsste.
             if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
 
             if (!resp.IsSuccessStatusCode)
@@ -121,7 +121,7 @@ public sealed class GithubRepoService
             if (pageItems.Count < 100) break;
         }
 
-        _logger.LogInformation("GitHub: {Count} Repos fuer {Account} geladen ({Endpoint})",
+        _logger.LogInformation("GitHub: {Count} Repos für {Account} geladen ({Endpoint})",
             result.Count, account, endpoint);
         return result;
     }
@@ -157,7 +157,7 @@ public sealed class GithubRepoService
         return paths;
     }
 
-    /// <summary>Laedt eine Datei aus dem Repo als Text (Raw-URL, kein API-Rate-Limit).</summary>
+    /// <summary>Lädt eine Datei aus dem Repo als Text (Raw-URL, kein API-Rate-Limit).</summary>
     public async Task<string> GetRawFileAsync(string ownerRepo, string branch, string path, CancellationToken ct = default)
     {
         var client = _factory.CreateClient(HttpClientName);

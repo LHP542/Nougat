@@ -11,7 +11,7 @@ namespace Nougat.Services;
 
 /// <summary>
 /// System-Tray-Integration nach Kroste-Standard.
-/// Minimieren -> Hide, Schliessen -> App beendet regulaer, Tray-Klick -> Restore.
+/// Minimieren -> Hide, Schließen -> App beendet regulär, Tray-Klick -> Restore.
 /// Vier Pflicht-Absicherungen: GC-Referenz (Feld halten), Restore-Guard,
 /// try/catch mit Fallback, Linux via Tmds.DBus.Protocol (transitive).
 /// </summary>
@@ -56,7 +56,7 @@ public sealed class TrayController
         catch (Exception ex)
         {
             _tray = null;
-            _logger.Warn(ex, "System-Tray nicht verfuegbar - Fallback: Standard-Minimieren.");
+            _logger.Warn(ex, "System-Tray nicht verfügbar - Fallback: Standard-Minimieren.");
         }
     }
 

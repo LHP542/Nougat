@@ -38,7 +38,7 @@
         <Style Selector="Button.chrome.close:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="#C42B1C" />
         </Style>
-        <!-- Kroste-Akzent-Button (Primaeraktion) -->
+        <!-- Kroste-Akzent-Button (Primäraktion) -->
         <Style Selector="Button.accent">
             <Setter Property="Background" Value="{DynamicResource KrosteAccentBrush}" />
             <Setter Property="Foreground" Value="White" />

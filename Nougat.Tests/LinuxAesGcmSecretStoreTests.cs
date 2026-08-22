@@ -52,7 +52,7 @@ public class LinuxAesGcmSecretStoreTests : IDisposable
     public void Legacy_plain_string_returned_as_is()
     {
         var store = new LinuxAesGcmSecretStore(_keyPath);
-        // Kein ENC1-Prefix -> Klartext, tolerant zurueckgeben
+        // Kein ENC1-Prefix -> Klartext, tolerant zurückgeben
         store.Unprotect("klartext").Should().Be("klartext");
     }
 }

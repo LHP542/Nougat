@@ -1,5 +1,5 @@
 <Project>
-  <!-- Central Package Management: EINZIGER Ort fuer Paketversionen. -->
+  <!-- Central Package Management: EINZIGER Ort für Paketversionen. -->
   <ItemGroup>
     <!-- Avalonia (12.1.x). DiagnosticsSupport folgt NICHT der Avalonia-Version! -->
     <PackageVersion Include="Avalonia" Version="12.1.0" />

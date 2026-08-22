@@ -25,9 +25,9 @@
         </Border>
 
         <StackPanel Margin="24,16" Spacing="10">
-            <TextBlock Text="Zum Bau des Bundles wird .NET 10 SDK benoetigt."
+            <TextBlock Text="Zum Bau des Bundles wird .NET 10 SDK benötigt."
                        Foreground="White" TextWrapping="Wrap" />
-            <TextBlock Text="Es wird nach ~/.dotnet-nougat installiert (ca. 400 MB). Keine Systemaenderungen, kein sudo."
+            <TextBlock Text="Es wird nach ~/.dotnet-nougat installiert (ca. 400 MB). Keine Systemänderungen, kein sudo."
                        Foreground="{DynamicResource KrosteMutedBrush}" TextWrapping="Wrap" />
             <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="8" />
             <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource KrosteGoldBrush}" />

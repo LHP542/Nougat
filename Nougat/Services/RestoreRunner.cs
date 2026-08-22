@@ -8,10 +8,10 @@ using Nougat.Models;
 namespace Nougat.Services;
 
 /// <summary>
-/// Fuehrt "dotnet restore" fuer das Anker-Projekt aus - portable + je RID.
+/// Führt "dotnet restore" für das Anker-Projekt aus - portable + je RID.
 /// Live-Ausgabe geht ans UI und parallel als Debug/Warn ins NLog-File.
 /// Bei Fehlschlag werden die letzten Ausgabezeilen als Error ins Log geschrieben,
-/// damit die tatsaechliche Ursache auch offline nachvollziehbar ist.
+/// damit die tatsächliche Ursache auch offline nachvollziehbar ist.
 /// </summary>
 public sealed class RestoreRunner
 {

@@ -13,8 +13,8 @@ public sealed record DeduplicationResult(
 );
 
 /// <summary>
-/// Fuehrt PackageReferences aus mehreren Repos zusammen. Bei Version-Konflikten
-/// gewinnt die "hoechste" Version (siehe <see cref="PackageVersionSelector"/>).
+/// Führt PackageReferences aus mehreren Repos zusammen. Bei Version-Konflikten
+/// gewinnt die "höchste" Version (siehe <see cref="PackageVersionSelector"/>).
 /// PackageReferences OHNE Version werden verworfen (Warning).
 /// ConflictInfo listet pro Version die Herkunfts-Repos.
 /// </summary>
@@ -31,7 +31,7 @@ public sealed class PackageDeduplicator
             {
                 warnings.Add(
                     $"{p.SourceRepo}: '{p.Id}' hat keine Version (weder in {p.SourceFile} noch in " +
-                    "Directory.Packages.props). Wird uebersprungen.");
+                    "Directory.Packages.props). Wird übersprungen.");
                 continue;
             }
 
@@ -48,7 +48,7 @@ public sealed class PackageDeduplicator
 
         foreach (var (id, refs) in byId)
         {
-            // Winner: hoechste Version quer ueber alle Vorkommen
+            // Winner: höchste Version quer über alle Vorkommen
             var winner = refs[0];
             foreach (var candidate in refs.Skip(1))
             {
