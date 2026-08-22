@@ -6,77 +6,77 @@
                      x:Class="Nougat.Views.SettingsWindow"
                      x:DataType="vm:SettingsWindowViewModel"
                      Title="Einstellungen"
-                     Width="640" Height="560"
+                     Width="660" Height="620"
                      MinWidth="520" MinHeight="440"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
         <ctrl:TitleBar DockPanel.Dock="Top" Title="Einstellungen" />
 
-        <Border DockPanel.Dock="Bottom"
-                Background="{DynamicResource KrosteTitleBarBrush}"
-                Padding="12,8">
+        <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Content="Abbrechen" Command="{Binding CancelCommand}" Padding="14,6" />
-                <Button Content="Speichern" Command="{Binding SaveCommand}" Classes="accent" MinWidth="120" />
+                <Button Classes="ghost" Content="Abbrechen" Command="{Binding CancelCommand}" />
+                <Button Classes="accent" Content="Speichern" Command="{Binding SaveCommand}" MinWidth="120" />
             </StackPanel>
         </Border>
 
-        <ScrollViewer Padding="24,16">
-            <StackPanel Spacing="14">
-                <TextBlock Text="GitHub Personal Access Token (optional)"
-                           Foreground="{DynamicResource KrosteGoldBrush}"
-                           FontWeight="SemiBold" />
-                <TextBox Text="{Binding Pat, Mode=TwoWay}"
-                         PasswordChar="*"
-                         Background="{DynamicResource KrosteSurfaceBrush}"
-                         Foreground="White"
-                         PlaceholderText="ghp_..." />
-                <TextBlock Text="Ohne PAT: 60 API-Requests pro Stunde. Mit PAT: 5000/h. Wird verschlüsselt gespeichert."
-                           Foreground="{DynamicResource KrosteMutedBrush}"
-                           TextWrapping="Wrap" FontSize="11" />
-
-                <Separator Background="#22262B" />
-
-                <TextBlock Text="Zielordner (NuGet-Local)"
-                           Foreground="{DynamicResource KrosteGoldBrush}"
-                           FontWeight="SemiBold" />
-                <TextBox Text="{Binding OutputDirectory, Mode=TwoWay}"
-                         Background="{DynamicResource KrosteSurfaceBrush}"
-                         Foreground="White" />
-
-                <TextBlock Text="Arbeitsverzeichnis (Restore-Cache)"
-                           Foreground="{DynamicResource KrosteGoldBrush}"
-                           FontWeight="SemiBold" />
-                <TextBox Text="{Binding WorkDirectory, Mode=TwoWay}"
-                         Background="{DynamicResource KrosteSurfaceBrush}"
-                         Foreground="White" />
-
-                <Separator Background="#22262B" />
-
-                <TextBlock Text="Target-RIDs (für dotnet restore --runtime)"
-                           Foreground="{DynamicResource KrosteGoldBrush}"
-                           FontWeight="SemiBold" />
-                <StackPanel Orientation="Horizontal" Spacing="16">
-                    <CheckBox Content="win-x64" IsChecked="{Binding RidWinX64, Mode=TwoWay}" Foreground="White" />
-                    <CheckBox Content="linux-x64" IsChecked="{Binding RidLinuxX64, Mode=TwoWay}" Foreground="White" />
-                    <CheckBox Content="osx-x64" IsChecked="{Binding RidOsxX64, Mode=TwoWay}" Foreground="White" />
+        <ScrollViewer Padding="20,16">
+            <StackPanel Spacing="12">
+                <StackPanel Spacing="3">
+                    <TextBlock Classes="h1" Text="Einstellungen" />
+                    <TextBlock Classes="muted" Text="Gilt für alle Bundle-Läufe. Gespeichert unter $XDG_CONFIG_HOME/Nougat/settings.json." />
                 </StackPanel>
 
-                <Separator Background="#22262B" />
+                <!-- Zugang -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="section-label" Text="GITHUB-ZUGANG" />
+                        <TextBlock Classes="h2" Text="Personal Access Token (optional)" />
+                        <TextBox Text="{Binding Pat, Mode=TwoWay}"
+                                 PasswordChar="*"
+                                 PlaceholderText="ghp_..." />
+                        <TextBlock Classes="muted" TextWrapping="Wrap" FontSize="11"
+                                   Text="Ohne PAT: 60 API-Requests pro Stunde. Mit PAT: 5000/h und Zugriff auf private Repos. Wird AES-GCM-verschlüsselt gespeichert und im Log maskiert." />
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Text="Repo-Cache-TTL (Stunden)"
-                           Foreground="{DynamicResource KrosteGoldBrush}"
-                           FontWeight="SemiBold" />
-                <NumericUpDown Value="{Binding RepoCacheTtlHours, Mode=TwoWay}"
-                               Minimum="1" Maximum="168" Increment="1"
-                               FormatString="0"
-                               Background="{DynamicResource KrosteSurfaceBrush}"
-                               Foreground="White" />
+                <!-- Pfade -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="section-label" Text="PFADE" />
+                        <TextBlock Classes="h2" Text="Zielordner (NuGet-Local)" />
+                        <TextBox Text="{Binding OutputDirectory, Mode=TwoWay}" />
+                        <TextBlock Classes="h2" Text="Arbeitsverzeichnis (Restore-Cache)" Margin="0,6,0,0" />
+                        <TextBox Text="{Binding WorkDirectory, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
 
-                <CheckBox Content="Archivierte Repos anzeigen"
-                          IsChecked="{Binding ShowArchivedRepos, Mode=TwoWay}"
-                          Foreground="White" />
+                <!-- Restore -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="section-label" Text="RESTORE" />
+                        <TextBlock Classes="h2" Text="Target-RIDs (für dotnet restore --runtime)" />
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <CheckBox Content="win-x64" IsChecked="{Binding RidWinX64, Mode=TwoWay}" />
+                            <CheckBox Content="linux-x64" IsChecked="{Binding RidLinuxX64, Mode=TwoWay}" />
+                            <CheckBox Content="osx-x64" IsChecked="{Binding RidOsxX64, Mode=TwoWay}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Repo-Liste -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="section-label" Text="REPO-LISTE" />
+                        <TextBlock Classes="h2" Text="Cache-TTL (Stunden)" />
+                        <NumericUpDown Value="{Binding RepoCacheTtlHours, Mode=TwoWay}"
+                                       Minimum="1" Maximum="168" Increment="1"
+                                       FormatString="0" HorizontalAlignment="Left" MinWidth="160" />
+                        <CheckBox Content="Archivierte Repos anzeigen"
+                                  IsChecked="{Binding ShowArchivedRepos, Mode=TwoWay}"
+                                  Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

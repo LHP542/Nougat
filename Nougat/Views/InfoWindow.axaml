@@ -6,37 +6,34 @@
                      x:Class="Nougat.Views.InfoWindow"
                      x:DataType="vm:InfoWindowViewModel"
                      Title="Über Nougat"
-                     Width="520" Height="380"
-                     MinWidth="440" MinHeight="320"
+                     Width="560" Height="420"
+                     MinWidth="460" MinHeight="340"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
         <ctrl:TitleBar DockPanel.Dock="Top" Title="Über Nougat" />
 
-        <Border DockPanel.Dock="Bottom"
-                Background="{DynamicResource KrosteTitleBarBrush}"
-                Padding="12,10">
+        <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Content="GitHub" Click="OnGithubClick"
-                        Background="{DynamicResource KrosteAccentBrush}"
-                        Foreground="White" Padding="14,6" />
-                <Button Content="Buy me a coffee" Click="OnCoffeeClick"
-                        Background="#FFDD00" Foreground="Black"
-                        FontWeight="SemiBold" Padding="14,6" />
-                <Button Content="Schließen" Click="OnCloseClick" Padding="14,6" />
+                <Button Classes="ghost" Content="GitHub" Click="OnGithubClick" />
+                <Button Classes="coffee" Content="Buy me a coffee" Click="OnCoffeeClick" />
+                <Button Classes="accent" Content="Schließen" Click="OnCloseClick" />
             </StackPanel>
         </Border>
 
-        <StackPanel Margin="28,20" Spacing="14">
-            <TextBlock Text="Nougat"
-                       FontSize="28" FontWeight="Bold"
-                       Foreground="{DynamicResource KrosteGoldBrush}" />
-            <TextBlock Text="{Binding Version}"
-                       Foreground="{DynamicResource KrosteMutedBrush}" />
-            <TextBlock Text="{Binding Organisation}"
-                       Foreground="White" FontWeight="SemiBold" />
-            <TextBlock Text="{Binding Description}"
-                       Foreground="White" TextWrapping="Wrap" />
+        <StackPanel Margin="24,20" Spacing="14">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="h1" FontSize="28" Text="Nougat" />
+                <TextBlock Classes="muted" Text="{Binding Version}" />
+            </StackPanel>
+
+            <Border Classes="card">
+                <StackPanel Spacing="6">
+                    <TextBlock Classes="section-label" Text="HERAUSGEBER" />
+                    <TextBlock Classes="h2" FontSize="13" Text="{Binding Organisation}" />
+                    <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Description}" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </DockPanel>
 </chrome:ChromeWindow>

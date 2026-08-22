@@ -6,46 +6,43 @@
                      x:Class="Nougat.Views.SdkInstallWindow"
                      x:DataType="vm:SdkInstallViewModel"
                      Title=".NET SDK installieren"
-                     Width="620" Height="520"
+                     Width="640" Height="540"
                      MinWidth="500" MinHeight="380"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
         <ctrl:TitleBar DockPanel.Dock="Top" Title=".NET SDK installieren" />
 
-        <Border DockPanel.Dock="Bottom"
-                Background="{DynamicResource KrosteTitleBarBrush}"
-                Padding="12,10">
+        <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Content="Abbrechen" Command="{Binding CancelCommand}"
-                        IsEnabled="{Binding IsInstalling}" Padding="14,6" />
-                <Button Content="Jetzt installieren" Command="{Binding InstallCommand}"
-                        IsEnabled="{Binding !IsInstalling}" Classes="accent" MinWidth="160" />
+                <Button Classes="ghost" Content="Abbrechen" Command="{Binding CancelCommand}"
+                        IsEnabled="{Binding IsInstalling}" />
+                <Button Classes="accent" Content="Jetzt installieren" Command="{Binding InstallCommand}"
+                        IsEnabled="{Binding !IsInstalling}" MinWidth="160" />
             </StackPanel>
         </Border>
 
-        <StackPanel Margin="24,16" Spacing="10">
-            <TextBlock Text="Zum Bau des Bundles wird .NET 10 SDK benötigt."
-                       Foreground="White" TextWrapping="Wrap" />
-            <TextBlock Text="Es wird nach ~/.dotnet-nougat installiert (ca. 400 MB). Keine Systemänderungen, kein sudo."
-                       Foreground="{DynamicResource KrosteMutedBrush}" TextWrapping="Wrap" />
-            <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="8" />
-            <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource KrosteGoldBrush}" />
-            <Border BorderBrush="#22262B" BorderThickness="1" Height="260">
-                <ScrollViewer>
+        <DockPanel Margin="20,16">
+            <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,12">
+                <TextBlock Classes="h1" Text=".NET 10 SDK bereitstellen" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="Zum Bau des Bundles wird ein .NET-10-SDK gebraucht. Nougat installiert es nach ~/.dotnet-nougat (ca. 400 MB) — keine Systemänderungen, kein sudo, das globale ~/.dotnet bleibt unangetastet." />
+                <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" />
+                <TextBlock Classes="h2" FontSize="13" Text="{Binding StatusText}" />
+            </StackPanel>
+
+            <Border Classes="card-flat">
+                <ScrollViewer Padding="12">
                     <ItemsControl ItemsSource="{Binding LogLines}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}"
-                                           FontFamily="Cascadia Code, Consolas, monospace"
-                                           FontSize="11"
-                                           Foreground="White"
-                                           TextWrapping="Wrap" />
+                                <TextBlock Classes="log secondary" FontSize="11"
+                                           Text="{Binding}" TextWrapping="Wrap" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
             </Border>
-        </StackPanel>
+        </DockPanel>
     </DockPanel>
 </chrome:ChromeWindow>
