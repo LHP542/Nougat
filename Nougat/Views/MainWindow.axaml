@@ -1,5 +1,6 @@
 <chrome:ChromeWindow xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:loc="using:Nougat.Localization"
                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                      xmlns:chrome="using:Nougat.Chrome"
@@ -21,9 +22,9 @@
         <!-- Menüleiste -->
         <Border DockPanel.Dock="Top" Classes="header">
             <StackPanel Orientation="Horizontal" Margin="8,0">
-                <Button Classes="menu" Content="Einstellungen" Click="OnSettingsClick" />
-                <Button Classes="menu" Content=".NET SDK installieren" Click="OnInstallSdkClick" />
-                <Button Classes="menu" Content="Über" Click="OnAboutClick" />
+                <Button Classes="menu" Content="{loc:Tr Menu_Settings}" Click="OnSettingsClick" />
+                <Button Classes="menu" Content="{loc:Tr Menu_InstallSdk}" Click="OnInstallSdkClick" />
+                <Button Classes="menu" Content="{loc:Tr Menu_About}" Click="OnAboutClick" />
             </StackPanel>
         </Border>
 
@@ -31,15 +32,15 @@
         <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                 <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="3">
-                    <TextBlock Classes="section-label" Text="ZIELORDNER" Margin="0" />
+                    <TextBlock Classes="section-label" Text="{loc:Tr Main_TargetFolder}" Margin="0" />
                     <TextBox Text="{Binding OutputDirectory, Mode=TwoWay}"
                              MinWidth="380" MaxWidth="620"
                              HorizontalAlignment="Left" />
                 </StackPanel>
-                <Button Grid.Column="1" Classes="danger" Content="Abbrechen"
+                <Button Grid.Column="1" Classes="danger" Content="{loc:Tr Common_Cancel}"
                         Command="{Binding CancelBuildCommand}"
                         VerticalAlignment="Bottom" />
-                <Button Grid.Column="2" Classes="accent" Content="Bundle bauen"
+                <Button Grid.Column="2" Classes="accent" Content="{loc:Tr Main_BuildBundle}"
                         Command="{Binding BuildBundleCommand}"
                         MinWidth="160" VerticalAlignment="Bottom" />
             </Grid>
@@ -59,9 +60,9 @@
             <Border Grid.Column="0" Classes="card-flat">
                 <DockPanel>
                     <Grid DockPanel.Dock="Top" Margin="14,12,14,4" ColumnDefinitions="*,Auto">
-                        <TextBlock Grid.Column="0" Classes="h2" Text="Repositories"
+                        <TextBlock Grid.Column="0" Classes="h2" Text="{loc:Tr Main_Repositories}"
                                    VerticalAlignment="Center" />
-                        <Button Grid.Column="1" Classes="ghost" Content="Aktualisieren"
+                        <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr Common_Refresh}"
                                 Command="{Binding RefreshReposCommand}"
                                 Padding="10,4" />
                     </Grid>
@@ -72,7 +73,7 @@
                     <Border DockPanel.Dock="Bottom" Classes="header"
                             BorderThickness="0,1,0,0" Padding="14,8">
                         <TextBlock Classes="h2" FontSize="12"
-                                   Text="{Binding SelectedCount, StringFormat={}{0} ausgewählt}" />
+                                   Text="{Binding SelectedCountText}" />
                     </Border>
 
                     <ScrollViewer>
@@ -102,7 +103,7 @@
             <!-- Log-Panel -->
             <Border Grid.Column="1" Classes="card-flat">
                 <DockPanel Margin="14,12">
-                    <TextBlock DockPanel.Dock="Top" Classes="h2" Text="Log" Margin="0,0,0,8" />
+                    <TextBlock DockPanel.Dock="Top" Classes="h2" Text="{loc:Tr Main_Log}" Margin="0,0,0,8" />
                     <ScrollViewer x:Name="LogScroll" HorizontalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding LogEntries}">
                             <ItemsControl.ItemTemplate>

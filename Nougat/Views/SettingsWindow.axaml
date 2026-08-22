@@ -1,52 +1,70 @@
 <chrome:ChromeWindow xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:loc="using:Nougat.Localization"
                      xmlns:chrome="using:Nougat.Chrome"
                      xmlns:ctrl="using:Nougat.Controls"
                      xmlns:vm="using:Nougat.ViewModels"
                      x:Class="Nougat.Views.SettingsWindow"
                      x:DataType="vm:SettingsWindowViewModel"
-                     Title="Einstellungen"
+                     Title="{loc:Tr Settings_Title}"
                      Width="660" Height="620"
                      MinWidth="520" MinHeight="440"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
-        <ctrl:TitleBar DockPanel.Dock="Top" Title="Einstellungen" />
+        <ctrl:TitleBar DockPanel.Dock="Top" Title="{loc:Tr Settings_Title}" />
 
         <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Classes="ghost" Content="Abbrechen" Command="{Binding CancelCommand}" />
-                <Button Classes="accent" Content="Speichern" Command="{Binding SaveCommand}" MinWidth="120" />
+                <Button Classes="ghost" Content="{loc:Tr Common_Cancel}" Command="{Binding CancelCommand}" />
+                <Button Classes="accent" Content="{loc:Tr Common_Save}" Command="{Binding SaveCommand}" MinWidth="120" />
             </StackPanel>
         </Border>
 
         <ScrollViewer Padding="20,16">
             <StackPanel Spacing="12">
                 <StackPanel Spacing="3">
-                    <TextBlock Classes="h1" Text="Einstellungen" />
-                    <TextBlock Classes="muted" Text="Gilt für alle Bundle-Läufe. Gespeichert unter $XDG_CONFIG_HOME/Nougat/settings.json." />
+                    <TextBlock Classes="h1" Text="{loc:Tr Settings_Title}" />
+                    <TextBlock Classes="muted" Text="{loc:Tr Settings_Subtitle}" />
                 </StackPanel>
+
+                <!-- Sprache: bewusst ganz oben, weil der Rest des Fensters davon abhaengt -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="section-label" Text="{loc:Tr Settings_SectionLanguage}" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_Language}" />
+                        <ComboBox ItemsSource="{Binding Languages}"
+                                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                  HorizontalAlignment="Left" MinWidth="220">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LanguageChoice">
+                                    <TextBlock Text="{Binding Display}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
 
                 <!-- Zugang -->
                 <Border Classes="card">
                     <StackPanel Spacing="8">
-                        <TextBlock Classes="section-label" Text="GITHUB-ZUGANG" />
-                        <TextBlock Classes="h2" Text="Personal Access Token (optional)" />
+                        <TextBlock Classes="section-label" Text="{loc:Tr Settings_SectionGithub}" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_Pat}" />
                         <TextBox Text="{Binding Pat, Mode=TwoWay}"
                                  PasswordChar="*"
                                  PlaceholderText="ghp_..." />
                         <TextBlock Classes="muted" TextWrapping="Wrap" FontSize="11"
-                                   Text="Ohne PAT: 60 API-Requests pro Stunde. Mit PAT: 5000/h und Zugriff auf private Repos. Wird AES-GCM-verschlüsselt gespeichert und im Log maskiert." />
+                                   Text="{loc:Tr Settings_PatHint}" />
                     </StackPanel>
                 </Border>
 
                 <!-- Pfade -->
                 <Border Classes="card">
                     <StackPanel Spacing="8">
-                        <TextBlock Classes="section-label" Text="PFADE" />
-                        <TextBlock Classes="h2" Text="Zielordner (NuGet-Local)" />
+                        <TextBlock Classes="section-label" Text="{loc:Tr Settings_SectionPaths}" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_OutputDir}" />
                         <TextBox Text="{Binding OutputDirectory, Mode=TwoWay}" />
-                        <TextBlock Classes="h2" Text="Arbeitsverzeichnis (Restore-Cache)" Margin="0,6,0,0" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_WorkDir}" Margin="0,6,0,0" />
                         <TextBox Text="{Binding WorkDirectory, Mode=TwoWay}" />
                     </StackPanel>
                 </Border>
@@ -54,8 +72,8 @@
                 <!-- Restore -->
                 <Border Classes="card">
                     <StackPanel Spacing="8">
-                        <TextBlock Classes="section-label" Text="RESTORE" />
-                        <TextBlock Classes="h2" Text="Target-RIDs (für dotnet restore --runtime)" />
+                        <TextBlock Classes="section-label" Text="{loc:Tr Settings_SectionRestore}" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_Rids}" />
                         <StackPanel Orientation="Horizontal" Spacing="16">
                             <CheckBox Content="win-x64" IsChecked="{Binding RidWinX64, Mode=TwoWay}" />
                             <CheckBox Content="linux-x64" IsChecked="{Binding RidLinuxX64, Mode=TwoWay}" />
@@ -67,12 +85,12 @@
                 <!-- Repo-Liste -->
                 <Border Classes="card">
                     <StackPanel Spacing="8">
-                        <TextBlock Classes="section-label" Text="REPO-LISTE" />
-                        <TextBlock Classes="h2" Text="Cache-TTL (Stunden)" />
+                        <TextBlock Classes="section-label" Text="{loc:Tr Settings_SectionRepoList}" />
+                        <TextBlock Classes="h2" Text="{loc:Tr Settings_CacheTtl}" />
                         <NumericUpDown Value="{Binding RepoCacheTtlHours, Mode=TwoWay}"
                                        Minimum="1" Maximum="168" Increment="1"
                                        FormatString="0" HorizontalAlignment="Left" MinWidth="160" />
-                        <CheckBox Content="Archivierte Repos anzeigen"
+                        <CheckBox Content="{loc:Tr Settings_ShowArchived}"
                                   IsChecked="{Binding ShowArchivedRepos, Mode=TwoWay}"
                                   Margin="0,4,0,0" />
                     </StackPanel>

@@ -4,6 +4,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Nougat.Infrastructure;
+using Nougat.Localization;
+using Nougat.Models;
 using Nougat.Services;
 using Nougat.ViewModels;
 using Nougat.Views;
@@ -25,6 +27,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         Services = new ServiceCollection().AddNougat().BuildServiceProvider();
+        ApplyUiCulture();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -37,5 +40,17 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// Setzt die gespeicherte Sprache, BEVOR das erste Fenster gebaut wird —
+    /// sonst rendert die UI kurz in der Systemsprache und springt dann um.
+    /// Ohne gespeicherte Einstellung bleibt es bei der Systemsprache.
+    /// </summary>
+    private static void ApplyUiCulture()
+    {
+        var iso = Services.GetService<AppSettings>()?.UiCulture;
+        if (!string.IsNullOrWhiteSpace(iso))
+            LocalizationService.Instance.SetCulture(iso);
     }
 }

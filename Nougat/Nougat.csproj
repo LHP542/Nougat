@@ -11,6 +11,15 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets/**" />
     <None Update="nlog.config" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Kein Strings.Designer.cs: Der ResX-Generator laeuft nur unter Visual
+         Studio zuverlaessig. Der LocalizationService greift direkt per
+         ResourceManager zu, dafuer reicht das eingebettete EmbeddedResource. -->
+    <EmbeddedResource Update="Localization/Strings.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization/Strings.de.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <InternalsVisibleTo Include="Nougat.Tests" />
   </ItemGroup>
 

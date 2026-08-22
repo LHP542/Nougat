@@ -25,4 +25,10 @@ public sealed class AppSettings
 
     /// <summary>Archivierte Repos in der Liste anzeigen?</summary>
     public bool ShowArchivedRepos { get; set; }
+
+    /// <summary>
+    /// ISO-Code der UI-Sprache ("de"/"en"). Bewusst nullable: Ältere
+    /// settings.json-Dateien kennen das Feld nicht, dann gilt die Systemsprache.
+    /// </summary>
+    public string? UiCulture { get; set; }
 }

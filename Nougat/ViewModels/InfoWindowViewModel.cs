@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Nougat.Infrastructure;
+using Nougat.Localization;
 using Nougat.Services;
 
 namespace Nougat.ViewModels;
@@ -18,11 +19,6 @@ public partial class InfoWindowViewModel : ViewModelBase
     public string CoffeeUrl => "https://www.buymeacoffee.com/kroste";
     /// <summary>Arbeitsgruppe, unter der das Werkzeug entsteht.</summary>
     public string Organisation => "Arbeitsgruppe 5424 IT-Basis-Dienste";
-
-    public string Description =>
-        "Offline-NuGet-Bundle-Builder für die Repos der GitHub-Organisation LHP542.\n" +
-        "Wähle Repos aus, Nougat sammelt PackageReferences, führt dotnet restore aus\n" +
-        "und schreibt einen NuGet-Local-Ordner (analog zu nuget-offline-bundle.sh).";
 
     [ObservableProperty] public partial string UpdateStatus { get; set; } = "";
 
@@ -51,7 +47,7 @@ public partial class InfoWindowViewModel : ViewModelBase
     public async Task CheckUpdateAsync()
     {
         IsBusy = true;
-        UpdateStatus = "Suche nach Updates ...";
+        UpdateStatus = Loc.T("Update_Searching");
         try
         {
             var result = await _updates.CheckAsync(forceRefresh: true);
@@ -59,12 +55,10 @@ public partial class InfoWindowViewModel : ViewModelBase
 
             UpdateStatus = result switch
             {
-                { Error: { } e } => "Update-Prüfung fehlgeschlagen: " + e,
-                { UpdateAvailable: true, AssetAvailable: true } r =>
-                    $"Version {r.LatestVersion} ist verfügbar.",
-                { UpdateAvailable: true, AssetAvailable: false } r =>
-                    $"Version {r.LatestVersion} ist verfügbar, aber es gibt kein Paket für diese Plattform.",
-                _ => "Nougat ist aktuell.",
+                { Error: { } e } => Loc.T("Update_CheckFailed", e),
+                { UpdateAvailable: true, AssetAvailable: true } r => Loc.T("Update_Available", r.LatestVersion),
+                { UpdateAvailable: true, AssetAvailable: false } r => Loc.T("Update_NoAsset", r.LatestVersion),
+                _ => Loc.T("Update_UpToDate"),
             };
         }
         finally
@@ -81,7 +75,7 @@ public partial class InfoWindowViewModel : ViewModelBase
         IsBusy = true;
         IsDownloading = true;
         DownloadProgress = 0;
-        UpdateStatus = "Update wird geladen ...";
+        UpdateStatus = Loc.T("Update_Downloading");
         try
         {
             var progress = new Progress<double>(p => DownloadProgress = p);
@@ -89,11 +83,11 @@ public partial class InfoWindowViewModel : ViewModelBase
 
             if (!ok)
             {
-                UpdateStatus = "Update fehlgeschlagen — Details stehen im Log.";
+                UpdateStatus = Loc.T("Update_FailedSeeLog");
                 return;
             }
 
-            UpdateStatus = "Update wird installiert, Nougat startet neu ...";
+            UpdateStatus = Loc.T("Update_Installing");
             // PFLICHT: Der Installer wartet auf das Prozessende. Ohne diesen Aufruf
             // haengt die UI bei 100 % und das Update wird nie angewendet.
             _updates.TerminateForUpdate();
@@ -101,7 +95,7 @@ public partial class InfoWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Update-Installation fehlgeschlagen.");
-            UpdateStatus = "Update fehlgeschlagen: " + ex.Message;
+            UpdateStatus = Loc.T("Update_Failed", ex.Message);
         }
         finally
         {

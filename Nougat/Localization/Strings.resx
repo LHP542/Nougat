@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" /></xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" /></xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Error_Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="Error_CopyDetails" xml:space="preserve">
+    <value>Copy details</value>
+  </data>
+  <data name="Error_Heading" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="Error_Intro" xml:space="preserve">
+    <value>Nougat keeps running, but the last action was aborted. The full stack trace is in the log file.</value>
+  </data>
+  <data name="Error_OpenLog" xml:space="preserve">
+    <value>Open log</value>
+  </data>
+  <data name="Error_Title" xml:space="preserve">
+    <value>Unexpected error</value>
+  </data>
+  <data name="Info_CheckUpdate" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="Info_Coffee" xml:space="preserve">
+    <value>Buy me a coffee</value>
+  </data>
+  <data name="Info_Description" xml:space="preserve">
+    <value>Offline NuGet bundle builder for the repositories of the LHP542 GitHub organisation.
+Pick repositories, and Nougat collects their PackageReferences, runs dotnet restore and writes a NuGet-Local folder (the same result as nuget-offline-bundle.sh).</value>
+  </data>
+  <data name="Info_GitHub" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="Info_InstallUpdate" xml:space="preserve">
+    <value>⬇ Install update</value>
+  </data>
+  <data name="Info_SectionPublisher" xml:space="preserve">
+    <value>PUBLISHER</value>
+  </data>
+  <data name="Info_SectionUpdates" xml:space="preserve">
+    <value>UPDATES</value>
+  </data>
+  <data name="Info_Title" xml:space="preserve">
+    <value>About Nougat</value>
+  </data>
+  <data name="Log_RefreshingRepos" xml:space="preserve">
+    <value>Refreshing repository list ...</value>
+  </data>
+  <data name="Log_ReposLoadFailed" xml:space="preserve">
+    <value>Could not load repository list: {0}</value>
+  </data>
+  <data name="Log_ReposRefreshed" xml:space="preserve">
+    <value>{0} repositories refreshed</value>
+  </data>
+  <data name="Log_SdkFound" xml:space="preserve">
+    <value>.NET SDK found: {0} ({1})</value>
+  </data>
+  <data name="Log_SdkNotFound" xml:space="preserve">
+    <value>.NET 10 SDK not found. Install it from the settings window.</value>
+  </data>
+  <data name="Log_UnexpectedError" xml:space="preserve">
+    <value>Unexpected error: {0}</value>
+  </data>
+  <data name="Main_BuildBundle" xml:space="preserve">
+    <value>Build bundle</value>
+  </data>
+  <data name="Main_Log" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="Main_Repositories" xml:space="preserve">
+    <value>Repositories</value>
+  </data>
+  <data name="Main_SelectedCount" xml:space="preserve">
+    <value>{0} selected</value>
+  </data>
+  <data name="Main_TargetFolder" xml:space="preserve">
+    <value>TARGET FOLDER</value>
+  </data>
+  <data name="Main_Title" xml:space="preserve">
+    <value>Nougat – offline NuGet bundle builder</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Menu_InstallSdk" xml:space="preserve">
+    <value>Install .NET SDK</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Repos_FromCache" xml:space="preserve">
+    <value>Cache: {0} repositories, as of {1}</value>
+  </data>
+  <data name="Repos_LoadError" xml:space="preserve">
+    <value>Loading failed</value>
+  </data>
+  <data name="Repos_Loaded" xml:space="preserve">
+    <value>{0} repositories loaded ({1})</value>
+  </data>
+  <data name="Repos_Loading" xml:space="preserve">
+    <value>Loading repository list from GitHub ...</value>
+  </data>
+  <data name="Repos_RateLimited" xml:space="preserve">
+    <value>Rate limit reached – setting a PAT is recommended</value>
+  </data>
+  <data name="Sdk_Heading" xml:space="preserve">
+    <value>Provide the .NET 10 SDK</value>
+  </data>
+  <data name="Sdk_InstallNow" xml:space="preserve">
+    <value>Install now</value>
+  </data>
+  <data name="Sdk_Intro" xml:space="preserve">
+    <value>Building a bundle requires a .NET 10 SDK. Nougat installs it into ~/.dotnet-nougat (about 400 MB) — no system changes, no sudo, and the global ~/.dotnet stays untouched.</value>
+  </data>
+  <data name="Sdk_Title" xml:space="preserve">
+    <value>Install .NET SDK</value>
+  </data>
+  <data name="Settings_CacheTtl" xml:space="preserve">
+    <value>Cache TTL (hours)</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Display language</value>
+  </data>
+  <data name="Settings_OutputDir" xml:space="preserve">
+    <value>Target folder (NuGet-Local)</value>
+  </data>
+  <data name="Settings_Pat" xml:space="preserve">
+    <value>Personal access token (optional)</value>
+  </data>
+  <data name="Settings_PatHint" xml:space="preserve">
+    <value>Without a PAT: 60 API requests per hour. With a PAT: 5000/h plus access to private repositories. Stored AES-GCM encrypted and masked in the log.</value>
+  </data>
+  <data name="Settings_Rids" xml:space="preserve">
+    <value>Target RIDs (for dotnet restore --runtime)</value>
+  </data>
+  <data name="Settings_SectionGithub" xml:space="preserve">
+    <value>GITHUB ACCESS</value>
+  </data>
+  <data name="Settings_SectionLanguage" xml:space="preserve">
+    <value>LANGUAGE</value>
+  </data>
+  <data name="Settings_SectionPaths" xml:space="preserve">
+    <value>PATHS</value>
+  </data>
+  <data name="Settings_SectionRepoList" xml:space="preserve">
+    <value>REPOSITORY LIST</value>
+  </data>
+  <data name="Settings_SectionRestore" xml:space="preserve">
+    <value>RESTORE</value>
+  </data>
+  <data name="Settings_ShowArchived" xml:space="preserve">
+    <value>Show archived repositories</value>
+  </data>
+  <data name="Settings_Subtitle" xml:space="preserve">
+    <value>Applies to every bundle run. Stored in $XDG_CONFIG_HOME/Nougat/settings.json.</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_WorkDir" xml:space="preserve">
+    <value>Working directory (restore cache)</value>
+  </data>
+  <data name="Status_BundleStarting" xml:space="preserve">
+    <value>Starting bundle build ...</value>
+  </data>
+  <data name="Status_Cancelled" xml:space="preserve">
+    <value>Cancelled.</value>
+  </data>
+  <data name="Status_Done" xml:space="preserve">
+    <value>Done: {0} packages ({1:F1} MB)</value>
+  </data>
+  <data name="Status_Failed" xml:space="preserve">
+    <value>Failed: {0}</value>
+  </data>
+  <data name="Status_Ready" xml:space="preserve">
+    <value>Ready.</value>
+  </data>
+  <data name="Status_SdkMissing" xml:space="preserve">
+    <value>SDK missing.</value>
+  </data>
+  <data name="Update_Available" xml:space="preserve">
+    <value>Version {0} is available.</value>
+  </data>
+  <data name="Update_AvailableHint" xml:space="preserve">
+    <value>Version {0} is available (installed: {1}). Install it from Menu › About.</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Update check failed: {0}</value>
+  </data>
+  <data name="Update_Downloading" xml:space="preserve">
+    <value>Downloading update ...</value>
+  </data>
+  <data name="Update_Failed" xml:space="preserve">
+    <value>Update failed: {0}</value>
+  </data>
+  <data name="Update_FailedSeeLog" xml:space="preserve">
+    <value>Update failed — see the log for details.</value>
+  </data>
+  <data name="Update_Installing" xml:space="preserve">
+    <value>Installing update, Nougat will restart ...</value>
+  </data>
+  <data name="Update_NoAsset" xml:space="preserve">
+    <value>Version {0} is available, but there is no package for this platform.</value>
+  </data>
+  <data name="Update_Searching" xml:space="preserve">
+    <value>Checking for updates ...</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>Nougat is up to date.</value>
+  </data>
+</root>

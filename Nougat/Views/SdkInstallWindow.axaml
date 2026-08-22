@@ -1,32 +1,33 @@
 <chrome:ChromeWindow xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:loc="using:Nougat.Localization"
                      xmlns:chrome="using:Nougat.Chrome"
                      xmlns:ctrl="using:Nougat.Controls"
                      xmlns:vm="using:Nougat.ViewModels"
                      x:Class="Nougat.Views.SdkInstallWindow"
                      x:DataType="vm:SdkInstallViewModel"
-                     Title=".NET SDK installieren"
+                     Title="{loc:Tr Sdk_Title}"
                      Width="640" Height="540"
                      MinWidth="500" MinHeight="380"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
-        <ctrl:TitleBar DockPanel.Dock="Top" Title=".NET SDK installieren" />
+        <ctrl:TitleBar DockPanel.Dock="Top" Title="{loc:Tr Sdk_Title}" />
 
         <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Classes="ghost" Content="Abbrechen" Command="{Binding CancelCommand}"
+                <Button Classes="ghost" Content="{loc:Tr Common_Cancel}" Command="{Binding CancelCommand}"
                         IsEnabled="{Binding IsInstalling}" />
-                <Button Classes="accent" Content="Jetzt installieren" Command="{Binding InstallCommand}"
+                <Button Classes="accent" Content="{loc:Tr Sdk_InstallNow}" Command="{Binding InstallCommand}"
                         IsEnabled="{Binding !IsInstalling}" MinWidth="160" />
             </StackPanel>
         </Border>
 
         <DockPanel Margin="20,16">
             <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,12">
-                <TextBlock Classes="h1" Text=".NET 10 SDK bereitstellen" />
+                <TextBlock Classes="h1" Text="{loc:Tr Sdk_Heading}" />
                 <TextBlock Classes="secondary" TextWrapping="Wrap"
-                           Text="Zum Bau des Bundles wird ein .NET-10-SDK gebraucht. Nougat installiert es nach ~/.dotnet-nougat (ca. 400 MB) — keine Systemänderungen, kein sudo, das globale ~/.dotnet bleibt unangetastet." />
+                           Text="{loc:Tr Sdk_Intro}" />
                 <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" />
                 <TextBlock Classes="h2" FontSize="13" Text="{Binding StatusText}" />
             </StackPanel>

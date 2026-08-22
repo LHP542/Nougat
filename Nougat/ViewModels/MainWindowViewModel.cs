@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Nougat.Localization;
 using Nougat.Models;
 using Nougat.Services;
 
@@ -38,7 +39,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<LogEntry> LogEntries { get; } = [];
 
     [ObservableProperty] public partial string OutputDirectory { get; set; } = "";
-    [ObservableProperty] public partial string StatusText { get; set; } = "Bereit.";
+    [ObservableProperty] public partial string StatusText { get; set; } = Loc.T("Status_Ready");
     [ObservableProperty] public partial double Progress { get; set; }
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(BuildBundleCommand))]
@@ -48,10 +49,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(BuildBundleCommand))]
+    [NotifyPropertyChangedFor(nameof(SelectedCountText))]
     public partial int SelectedCount { get; set; }
+
+    /// <summary>
+    /// "{0} ausgewählt" als fertige Property statt StringFormat im XAML — ein
+    /// StringFormat-Literal wäre nicht übersetzbar.
+    /// </summary>
+    public string SelectedCountText => Loc.T("Main_SelectedCount", SelectedCount);
     [ObservableProperty] public partial string RepoListStatus { get; set; } = "";
 
-    public string Title => "Nougat - Offline-NuGet-Bundle-Builder";
+    public string Title => Loc.T("Main_Title");
 
     public MainWindowViewModel(
         GithubRepoService github,
@@ -87,7 +95,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             selectedFromCache = new HashSet<string>(cached.SelectedNames, StringComparer.OrdinalIgnoreCase);
             PopulateFromCache(cached.Repos, selectedFromCache);
-            RepoListStatus = $"Cache: {cached.Repos.Count} Repos, Stand {cached.FetchedAt.ToLocalTime():yyyy-MM-dd HH:mm}";
+            RepoListStatus = Loc.T("Repos_FromCache", cached.Repos.Count, cached.FetchedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"));
             if (_cache.IsFresh(cached, TimeSpan.FromHours(_settings.RepoCacheTtlHours)))
                 return;
         }
@@ -113,8 +121,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (result.UpdateAvailable)
         {
             AppendLog(LogEntry.Info(
-                $"Version {result.LatestVersion} ist verfügbar (installiert: {result.CurrentVersion}). "
-                + "Installieren über Menü \u203a Über."));
+                Loc.T("Update_AvailableHint", result.LatestVersion, result.CurrentVersion)));
         }
     }
 
@@ -123,8 +130,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            RepoListStatus = "Lade Repo-Liste von GitHub ...";
-            AppendLog(LogEntry.Info("Aktualisiere Repo-Liste ..."));
+            RepoListStatus = Loc.T("Repos_Loading");
+            AppendLog(LogEntry.Info(Loc.T("Log_RefreshingRepos")));
             var previouslySelected = new HashSet<string>(
                 Repos.Where(r => r.IsSelected).Select(r => r.FullName),
                 StringComparer.OrdinalIgnoreCase);
@@ -135,18 +142,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
             PopulateFromCache(list, previouslySelected);
             _cache.Save(list, previouslySelected);
-            RepoListStatus = $"{list.Count} Repos geladen ({GithubAccount})";
-            AppendLog(LogEntry.Info($"{list.Count} Repos aktualisiert"));
+            RepoListStatus = Loc.T("Repos_Loaded", list.Count, GithubAccount);
+            AppendLog(LogEntry.Info(Loc.T("Log_ReposRefreshed", list.Count)));
         }
         catch (GithubRateLimitedException ex)
         {
-            RepoListStatus = "Rate-Limit erreicht - PAT setzen empfohlen";
+            RepoListStatus = Loc.T("Repos_RateLimited");
             AppendLog(LogEntry.Error(ex.Message));
         }
         catch (Exception ex)
         {
-            RepoListStatus = "Fehler beim Laden";
-            AppendLog(LogEntry.Error($"Repo-Liste konnte nicht geladen werden: {ex.Message}"));
+            RepoListStatus = Loc.T("Repos_LoadError");
+            AppendLog(LogEntry.Error(Loc.T("Log_ReposLoadFailed", ex.Message)));
             _logger.LogWarning(ex, "Repo-Liste konnte nicht geladen werden");
         }
     }
@@ -191,16 +198,16 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             LogEntries.Clear();
             Progress = 0;
-            StatusText = "Bundle-Bau startet ...";
+            StatusText = Loc.T("Status_BundleStarting");
 
             var probe = await _sdk.ProbeAsync(_settings.CachedDotnetPath, _bundleCts.Token);
             if (probe.Status == SdkStatus.Missing || probe.ExecutablePath is null)
             {
-                AppendLog(LogEntry.Error(".NET 10 SDK nicht gefunden. Bitte in den Einstellungen installieren."));
-                StatusText = "SDK fehlt.";
+                AppendLog(LogEntry.Error(Loc.T("Log_SdkNotFound")));
+                StatusText = Loc.T("Status_SdkMissing");
                 return;
             }
-            AppendLog(LogEntry.Info($".NET SDK gefunden: {probe.ExecutablePath} ({probe.Version})"));
+            AppendLog(LogEntry.Info(Loc.T("Log_SdkFound", probe.ExecutablePath, probe.Version)));
 
             var config = new BundleConfig
             {
@@ -216,12 +223,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
             if (result.Success)
             {
-                StatusText = $"Fertig: {result.PackageCount} Pakete ({result.TotalSizeBytes / 1024.0 / 1024.0:F1} MB)";
+                StatusText = Loc.T("Status_Done", result.PackageCount, result.TotalSizeBytes / 1024.0 / 1024.0);
                 AppendLog(LogEntry.Info(StatusText));
             }
             else
             {
-                StatusText = "Fehlgeschlagen: " + result.ErrorMessage;
+                StatusText = Loc.T("Status_Failed", result.ErrorMessage);
                 AppendLog(LogEntry.Error(StatusText));
             }
         }
@@ -230,12 +237,12 @@ public partial class MainWindowViewModel : ViewModelBase
             // Kein Fehler, sondern die Antwort auf den Abbrechen-Button. Ohne
             // eigenen catch landete das im Exception-Zweig darunter und meldete
             // dem Nutzer einen "unerwarteten Fehler" fuer seine eigene Aktion.
-            StatusText = "Abgebrochen.";
+            StatusText = Loc.T("Status_Cancelled");
             AppendLog(LogEntry.Warn(StatusText));
         }
         catch (Exception ex)
         {
-            AppendLog(LogEntry.Error("Unerwarteter Fehler: " + ex.Message));
+            AppendLog(LogEntry.Error(Loc.T("Log_UnexpectedError", ex.Message)));
             _logger.LogError(ex, "Bundle-Bau fehlgeschlagen");
         }
         finally

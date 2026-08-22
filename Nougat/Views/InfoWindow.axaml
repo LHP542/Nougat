@@ -1,23 +1,24 @@
 <chrome:ChromeWindow xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:loc="using:Nougat.Localization"
                      xmlns:chrome="using:Nougat.Chrome"
                      xmlns:ctrl="using:Nougat.Controls"
                      xmlns:vm="using:Nougat.ViewModels"
                      x:Class="Nougat.Views.InfoWindow"
                      x:DataType="vm:InfoWindowViewModel"
-                     Title="Über Nougat"
+                     Title="{loc:Tr Info_Title}"
                      Width="560" Height="520"
                      MinWidth="460" MinHeight="420"
                      WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource KrosteBackgroundBrush}">
     <DockPanel>
-        <ctrl:TitleBar DockPanel.Dock="Top" Title="Über Nougat" />
+        <ctrl:TitleBar DockPanel.Dock="Top" Title="{loc:Tr Info_Title}" />
 
         <Border DockPanel.Dock="Bottom" Classes="statusbar">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Classes="ghost" Content="GitHub" Click="OnGithubClick" />
-                <Button Classes="coffee" Content="Buy me a coffee" Click="OnCoffeeClick" />
-                <Button Classes="accent" Content="Schließen" Click="OnCloseClick" />
+                <Button Classes="ghost" Content="{loc:Tr Info_GitHub}" Click="OnGithubClick" />
+                <Button Classes="coffee" Content="{loc:Tr Info_Coffee}" Click="OnCoffeeClick" />
+                <Button Classes="accent" Content="{loc:Tr Common_Close}" Click="OnCloseClick" />
             </StackPanel>
         </Border>
 
@@ -29,21 +30,21 @@
 
             <Border Classes="card">
                 <StackPanel Spacing="6">
-                    <TextBlock Classes="section-label" Text="HERAUSGEBER" />
+                    <TextBlock Classes="section-label" Text="{loc:Tr Info_SectionPublisher}" />
                     <TextBlock Classes="h2" FontSize="13" Text="{Binding Organisation}" />
-                    <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Description}" />
+                    <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{loc:Tr Info_Description}" />
                 </StackPanel>
             </Border>
 
             <Border Classes="card">
                 <StackPanel Spacing="8">
-                    <TextBlock Classes="section-label" Text="UPDATES" />
+                    <TextBlock Classes="section-label" Text="{loc:Tr Info_SectionUpdates}" />
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <TextBlock Grid.Column="0" Classes="secondary" VerticalAlignment="Center"
                                    TextWrapping="Wrap" Text="{Binding UpdateStatus}" />
-                        <Button Grid.Column="1" Classes="ghost" Content="Suchen"
+                        <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr Info_CheckUpdate}"
                                 Command="{Binding CheckUpdateCommand}" />
-                        <Button Grid.Column="2" Classes="accent" Content="⬇ Update installieren"
+                        <Button Grid.Column="2" Classes="accent" Content="{loc:Tr Info_InstallUpdate}"
                                 Command="{Binding InstallUpdateCommand}"
                                 IsVisible="{Binding UpdateAvailable}" />
                     </Grid>
