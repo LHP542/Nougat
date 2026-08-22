@@ -35,6 +35,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private CancellationTokenSource? _bundleCts;
 
+    /// <summary>
+    /// Sperre gegen Bootstrap-Persistenz: Das Setzen von OutputDirectory im
+    /// Konstruktor löst OnOutputDirectoryChanged aus und schrieb bisher bei JEDEM
+    /// App-Start die settings.json neu — ohne dass der Nutzer etwas geändert hätte.
+    /// Nur echte Nutzeränderungen sollen speichern.
+    /// </summary>
+    private bool _persistSettings;
+
     public ObservableCollection<RepoItemViewModel> Repos { get; } = [];
     public ObservableCollection<LogEntry> LogEntries { get; } = [];
 
@@ -81,6 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger = logger;
 
         OutputDirectory = _settings.OutputDirectory;
+        _persistSettings = true;
 
         // Beim Start: Cache lesen, dann im Hintergrund refresh.
         _ = LoadInitialAsync();
@@ -282,6 +291,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnOutputDirectoryChanged(string value)
     {
+        if (!_persistSettings)
+            return;
+
         _settings.OutputDirectory = value;
         try { _settingsService.Save(_settings); } catch { /* ignorieren */ }
     }
