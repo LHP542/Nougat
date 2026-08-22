@@ -26,11 +26,13 @@ public sealed record UpdateCheckResult(
 /// Update-Check und echtes Self-Update gegen GitHub Releases (Kroste-Standard:
 /// reine Benachrichtigung reicht nicht).
 ///
-/// Besonderheit gegenüber der RenPack-Vorlage: Nougat lebt in einer privaten
-/// Organisation. Dort ist browser_download_url NICHT anonym abrufbar — der
-/// Download muss über die Asset-API-URL mit "Accept: application/octet-stream"
-/// und dem PAT laufen. Der bestehende named HttpClient "github" bringt PAT und
-/// System-Proxy bereits mit.
+/// Besonderheit gegenüber der RenPack-Vorlage: Der Download läuft über die
+/// Asset-API-URL mit "Accept: application/octet-stream" statt über
+/// browser_download_url. Für das aktuell öffentliche Repo wäre beides möglich,
+/// aber nur dieser Weg trägt auch, wenn die Organisation ihre Repos auf privat
+/// stellt — dort ist browser_download_url nicht anonym abrufbar. Der bestehende
+/// named HttpClient "github" schickt einen konfigurierten PAT automatisch mit
+/// und bringt den System-Proxy gleich mit.
 /// </summary>
 public sealed class UpdateService
 {
@@ -76,7 +78,8 @@ public sealed class UpdateService
             using var response = await client.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)
             {
-                // 404 heißt bei privaten Repos meist "kein Release" ODER "PAT fehlt".
+                // 404 heißt "kein Release" — oder, sobald das Repo privat ist,
+                // schlicht "kein Zugriff". Beides mit einem Hinweis abdecken.
                 var hint = response.StatusCode == HttpStatusCode.NotFound
                     ? "Kein Release gefunden (bei privatem Repo: PAT in den Einstellungen prüfen)."
                     : $"GitHub antwortete mit {(int)response.StatusCode}.";
@@ -179,8 +182,8 @@ public sealed class UpdateService
     {
         using var client = _httpClientFactory.CreateClient(GithubRepoService.HttpClientName);
         using var request = new HttpRequestMessage(HttpMethod.Get, asset.Url);
-        // Pflicht für private Repos: Die API liefert nur mit diesem Accept-Header
-        // die Binärdaten statt der JSON-Metadaten.
+        // Pflicht: Die Asset-API liefert nur mit diesem Accept-Header die
+        // Binärdaten statt der JSON-Metadaten.
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
 
         using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);

@@ -7,21 +7,23 @@
 [![Release](https://img.shields.io/github/v/release/LHP542/Nougat)](https://github.com/LHP542/Nougat/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Offline-NuGet-Bundle-Builder für Kroste-Repos — Desktop-App für Windows und Linux (C# / .NET 10 / Avalonia 12).
+Offline-NuGet-Bundle-Builder für die Repos der Organisation LHP542 — Desktop-App für Windows und Linux (C# / .NET 10 / Avalonia 12).
 
-Nougat listet die GitHub-Repos unter `Kroste` per Checkbox auf, sammelt aus den markierten Repos alle `PackageReference`-Einträge (inklusive Central Package Management), führt `dotnet restore` aus und schreibt einen flachen `NuGet-Local`-Ordner samt `nuget.config.windows` und `README.txt` — bereit für die Offline-Installation auf dem Arbeitslaptop.
+Nougat listet die GitHub-Repos der Organisation `LHP542` per Checkbox auf, sammelt aus den markierten Repos alle `PackageReference`-Einträge (inklusive Central Package Management), führt `dotnet restore` aus und schreibt einen flachen `NuGet-Local`-Ordner samt `nuget.config.windows` und `README.txt` — bereit für die Offline-Installation auf dem Arbeitslaptop.
 
 Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine hart-codierte Paketliste mehr.
 
 ## Features
 
-- Repo-Liste vom GitHub-User `Kroste` via API (mit Cache + optionalem PAT für 5000 Requests/h).
+- Repo-Liste der Organisation `LHP542` via API (mit Cache + optionalem PAT für 5000 Requests/h und Zugriff auf private Repos).
 - Ein gemeinsames Bundle aus mehreren Repos, mit automatischer Deduplizierung bei Version-Konflikten (höchste Version gewinnt).
 - CPM-aware: `PackageReference` ohne Version wird per `Directory.Packages.props` desselben Repos aufgelöst.
 - Live-Log des `dotnet restore`-Fortschritts im UI, mit Cancel-Support.
 - .NET-10-SDK-Bootstrap: falls kein passendes SDK gefunden wird, kann Nougat es per `dotnet-install`-Skript nach `~/.dotnet-nougat` installieren (kein sudo, kein System-Umbau).
 - Zielordner wird vor jedem Lauf komplett geleert — analog zum Referenz-Skript.
 - PAT verschlüsselt (AES-GCM mit lokalem Master-Key), nie im Klartext gespeichert, im Log automatisch maskiert.
+- Oberfläche auf **Deutsch und Englisch**, live umschaltbar in den Einstellungen — ohne Neustart.
+- **Update-Check und Selbst-Update** über GitHub Releases: Das Über-Fenster lädt die neue Version, tauscht sie aus und startet Nougat neu.
 
 ## Installation
 
@@ -54,10 +56,19 @@ Erreichbar über den Menü-Eintrag „Einstellungen". Persistiert unter `$XDG_CO
 - **Zielordner / Arbeitsverzeichnis:** Frei wählbar.
 - **Target-RIDs:** `win-x64` (Default), `linux-x64`, `osx-x64` — je aktiver RID wird zusätzlich `dotnet restore --runtime <rid>` ausgeführt.
 - **Repo-Cache-TTL (Stunden):** Nach Ablauf wird die Repo-Liste beim nächsten Start neu geladen.
+- **Anzeigesprache:** Deutsch oder Englisch. Die Umschaltung wirkt sofort in allen offenen Fenstern.
 
 ## .NET-SDK-Handling
 
 Über den Menü-Eintrag „.NET SDK installieren" kann Nougat ein SDK 10 nach `~/.dotnet-nougat` bootstrappen (via `dotnet-install.sh` / `.ps1`). Das globale `~/.dotnet` bleibt unangetastet. Erkennt Nougat ein System-SDK ≥ 10 auf `PATH`, wird das verwendet.
+
+## Updates
+
+Beim Start prüft Nougat im Hintergrund, ob ein neueres Release vorliegt, und schreibt das Ergebnis als Zeile ins Log-Panel. Ist der Rechner offline oder blockt ein Proxy, passiert nichts weiter — der Check stört den Betrieb nie.
+
+Installiert wird nur auf Klick: **Menü › Über › „⬇ Update installieren"**. Nougat lädt das zur Plattform passende Paket, startet ein Austausch-Skript und beendet sich; danach läuft die neue Version. Das Protokoll des Austauschs liegt unter `$XDG_STATE_HOME/Nougat/update.log` (Linux) bzw. im Temp-Ordner des Update-Laufs (Windows).
+
+Der Update-Check braucht keinen PAT, solange das Repo öffentlich ist. Ein gesetzter PAT wird trotzdem mitgeschickt — damit funktioniert der Weg unverändert, falls die Organisation ihre Repos später auf privat stellt.
 
 ## Logs & Fehlersuche
 
@@ -67,7 +78,7 @@ Logdateien liegen im Unterordner `logs/` neben der Anwendung (Tagesarchiv, 14 Ta
 
 ```bash
 dotnet build       # bauen
-dotnet test        # 34 Unit-Tests
+dotnet test        # 50 Unit-Tests
 dotnet run --project Nougat
 ```
 
