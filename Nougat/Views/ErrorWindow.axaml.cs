@@ -1,11 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Input.Platform;
 using Nougat.Chrome;
-using Nougat.Services;
 using NLog;
 
 namespace Nougat.Views;

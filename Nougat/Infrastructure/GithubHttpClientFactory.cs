@@ -1,8 +1,5 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Nougat.Models;
 using Nougat.Services;
@@ -14,8 +11,9 @@ public static class GithubHttpClientFactory
 {
     public static IServiceCollection AddGithubHttpClient(this IServiceCollection services)
     {
-        var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0";
-        var userAgent = $"Nougat/{version}";
+        // Dieselbe Quelle wie Info-Fenster und Update-Check: AssemblyVersion
+        // rundet Prereleases auf X.Y.Z.0 und wuerde im User-Agent luegen.
+        var version = AppVersion.Current;
 
         services.AddHttpClient(GithubRepoService.HttpClientName, (sp, client) =>
         {

@@ -1,0 +1,55 @@
+# Kroste-Standard: einheitlicher Stil, durchgesetzt am Compiler statt im Review.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{yml,yaml,json,axaml,xml,csproj,props,config,slnx}]
+indent_size = 2
+
+[*.md]
+# Zeilenumbrüche am Zeilenende sind in Markdown bedeutungstragend.
+trim_trailing_whitespace = false
+
+[*.ps1]
+# Windows PowerShell 5.1 braucht CRLF und ein BOM, sonst zerlegt es Umlaute.
+end_of_line = crlf
+
+[*.cs]
+# File-scoped Namespaces (Kroste-Standard)
+csharp_style_namespace_declarations = file_scoped:error
+
+# Accessibility-Modifier erzwingen
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
+
+# var nur, wenn der Typ rechts steht
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Moderne Sprachfeatures bevorzugen
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_prefer_primary_constructors = false:suggestion
+csharp_prefer_braces = when_multiline:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+
+# using-Direktiven: System zuerst, außerhalb des Namespace
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:error
+
+# Ungenutzte using-Direktiven sind ein Fehler, nicht nur ein Hinweis —
+# mit TreatWarningsAsErrors bleibt der Build damit sauber.
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Private Felder mit führendem Unterstrich (im Bestand durchgehend so)
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case

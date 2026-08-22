@@ -10,6 +10,8 @@ Erzeugt:
 - Nougat/Assets/nougat.ico   (Windows-Multi-Res)
 """
 
+from pathlib import Path
+
 from PIL import Image, ImageDraw
 
 GOLD     = (224, 177, 76, 255)     # #E0B14C
@@ -76,16 +78,22 @@ def make_icon(size: int) -> Image.Image:
     return img
 
 if __name__ == "__main__":
+    # Repo-relativ: <repo>/scripts/build_icon.py -> <repo>/Nougat/Assets.
+    # Absolute /home/<user>/...-Pfade machen das Skript auf dem Arbeitslaptop
+    # unbrauchbar (in DTM genau so passiert).
+    assets = Path(__file__).resolve().parent.parent / "Nougat" / "Assets"
+    assets.mkdir(parents=True, exist_ok=True)
+
     master = make_icon(256)
-    master.save("/home/OsteL/Entwicklung/Nougat/Nougat/Assets/nougat.png", "PNG")
-    print("Wrote nougat.png (256x256)")
+    master.save(assets / "nougat.png", "PNG")
+    print(f"Wrote {assets / 'nougat.png'} (256x256)")
 
     sizes = [16, 24, 32, 48, 64, 128, 256]
     icons = [make_icon(s) for s in sizes]
     icons[0].save(
-        "/home/OsteL/Entwicklung/Nougat/Nougat/Assets/nougat.ico",
+        assets / "nougat.ico",
         format="ICO",
         sizes=[(s, s) for s in sizes],
         append_images=icons[1:],
     )
-    print(f"Wrote nougat.ico (multi-res: {sizes})")
+    print(f"Wrote {assets / 'nougat.ico'} (multi-res: {sizes})")

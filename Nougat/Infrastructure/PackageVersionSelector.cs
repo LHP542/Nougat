@@ -1,4 +1,3 @@
-using System;
 using Semver;
 
 namespace Nougat.Infrastructure;

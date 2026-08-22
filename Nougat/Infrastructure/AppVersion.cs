@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 namespace Nougat.Infrastructure;

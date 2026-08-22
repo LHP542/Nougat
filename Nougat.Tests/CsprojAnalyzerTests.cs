@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FluentAssertions;
 using Nougat.Models;
 using Nougat.Services;

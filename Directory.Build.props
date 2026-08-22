@@ -6,7 +6,20 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Ohne das bleibt die .editorconfig eine reine IDE-Empfehlung und die
+         Regeln greifen im CI gar nicht. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Voraussetzung fuer IDE0005 im Build (Roslyn-Issue 41640): Der Analyzer
+         braucht die XML-Doku-Erzeugung, sonst meldet er sich gar nicht erst. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591 "fehlender XML-Kommentar" gilt nicht: Doku-Kommentare stehen dort,
+         wo sie etwas erklaeren, nicht auf jedem Member. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Authors>Lars Oste</Authors>
+    <Company>Arbeitsgruppe 5424 IT-Basis-Dienste</Company>
+    <RepositoryUrl>https://github.com/LHP542/Nougat</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <!-- MinVer: Version aus Git-Tags (v*) -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>

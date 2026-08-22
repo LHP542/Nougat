@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Concurrent;
 using System.Text;
 using NLog;
 using NLog.Config;
 using NLog.LayoutRenderers;
 using NLog.LayoutRenderers.Wrappers;
-using NLog.Layouts;
 
 namespace Nougat.Services;
 
