@@ -16,7 +16,7 @@ Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine
 ## Features
 
 - Repo-Liste der Organisation `LHP542` via API (mit Cache + optionalem PAT für 5000 Requests/h und Zugriff auf private Repos).
-- Ein gemeinsames Bundle aus mehreren Repos, mit automatischer Deduplizierung bei Version-Konflikten (höchste Version gewinnt).
+- Ein gemeinsames Bundle aus mehreren Repos. Legen zwei Repos dasselbe Paket in **unterschiedlichen Versionen** fest, landen **beide** im Bundle — jedes Repo wird einzeln restored und bekommt genau die Version, die es selbst festlegt. (Nur die höchste zu nehmen wäre gefährlich: NuGet löst offline still auf die nächsthöhere auf, und der Fehler zeigt sich erst zur Laufzeit.)
 - CPM-aware: `PackageReference` ohne Version wird per `Directory.Packages.props` desselben Repos aufgelöst.
 - **Transitive Pins inklusive:** Nutzt ein Repo `CentralPackageTransitivePinningEnabled`, stehen in seiner `Directory.Packages.props` Pakete, die kein Projekt direkt referenziert. Nougat sammelt sie mit und pinnt sie im Anker genauso — sonst landen im Bundle die niedrigsten statt der tatsächlich aufgelösten Versionen.
 - **Baut gegen alle TargetFrameworks der ausgewählten Repos**, damit auch die Windows-Ref- und Runtime-Packs eines `net10.0-windows`-Projekts im Bundle liegen.
@@ -47,7 +47,7 @@ chmod +x Nougat-*-x86_64.AppImage
 1. **Repo-Liste laden:** Beim ersten Start (oder über „Aktualisieren") holt Nougat die Repo-Liste von GitHub. Ergebnis wird lokal gecached (TTL in den Einstellungen).
 2. **Repos auswählen:** Checkbox pro Repo — die Auswahl bleibt zwischen den Sessions erhalten.
 3. **Zielordner prüfen:** Der Zielordner steht im Footer (Default: `~/nuget-offline-work/NuGet-Local`).
-4. **„Bundle bauen":** Nougat analysiert die csproj-/`Directory.Packages.props`-Dateien via GitHub Contents-API, dedupliziert die Pakete (bei Konflikten höchste Version), erzeugt ein Anker-Projekt und lässt `dotnet restore` durchlaufen. Anschließend werden alle `.nupkg` flach in den Zielordner kopiert, dazu `nuget.config.windows` und `README.txt`.
+4. **„Bundle bauen":** Nougat analysiert die csproj-/`Directory.Packages.props`-Dateien via GitHub Contents-API, erzeugt pro Repo ein Anker-Projekt und lässt `dotnet restore` durchlaufen — alle in denselben Paket-Cache. Anschließend werden alle `.nupkg` flach in den Zielordner kopiert, dazu `nuget.config.windows` und `README.txt`.
 5. **Auf den Zielrechner übertragen:** Ordnerinhalt nach `C:\NuGet-Local` kopieren, `nuget.config.windows` in `nuget.config` umbenennen — Details stehen in der generierten `README.txt`.
 
 ## Einstellungen
