@@ -60,13 +60,15 @@ public sealed class NugetConfigWriter
 
         if (conflicts.Count > 0)
         {
-            sb.AppendLine("Version-Konflikte (höchste Version gewählt):");
+            sb.AppendLine("Pakete, die in mehreren Versionen gebraucht werden:");
+            sb.AppendLine("(alle aufgeführten Versionen liegen im Bundle - jedes Repo");
+            sb.AppendLine(" restored gegen die Version, die es selbst festlegt)");
             foreach (var c in conflicts.OrderBy(c => c.PackageId, StringComparer.OrdinalIgnoreCase))
             {
                 sb.AppendLine($"  {c.PackageId}");
-                sb.AppendLine($"    gewählt:  {c.ChosenVersion}  <- {string.Join(", ", c.ChosenRepos)}");
+                sb.AppendLine($"    {c.ChosenVersion}  <- {string.Join(", ", c.ChosenRepos)}");
                 foreach (var d in c.DiscardedSources)
-                    sb.AppendLine($"    verworfen: {d.Version}  <- {string.Join(", ", d.Repos)}");
+                    sb.AppendLine($"    {d.Version}  <- {string.Join(", ", d.Repos)}");
             }
             sb.AppendLine();
         }

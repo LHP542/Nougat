@@ -67,38 +67,91 @@ public sealed class BundleOrchestrator
                 .SelectMany(v => v.TargetFrameworks)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            Report(progress, BundlePhase.Deduplicating, 0.35, "Dedupliziere Pakete");
+            // Der globale Dedup dient nur noch der Übersicht: Welche Pakete
+            // brauchen die Repos in unterschiedlichen Versionen? Gefiltert wird
+            // damit NICHTS mehr — jedes Repo restored gegen seine eigenen Versionen.
+            Report(progress, BundlePhase.Deduplicating, 0.35, "Prüfe Versionsunterschiede");
             var dedup = _deduplicator.Deduplicate(allPackages);
             allWarnings.AddRange(dedup.Warnings);
             foreach (var conflict in dedup.Conflicts)
             {
-                var chosenRepos = string.Join(", ", conflict.ChosenRepos);
-                var discarded = string.Join(" | ",
-                    conflict.DiscardedSources.Select(d => $"{d.Version} <- {string.Join(", ", d.Repos)}"));
-                Log(progress, LogEntry.Warn(
-                    $"Konflikt: {conflict.PackageId} -> {conflict.ChosenVersion} " +
-                    $"(aus: {chosenRepos}; verworfen: {discarded})"));
+                var alle = new[] { $"{conflict.ChosenVersion} <- {string.Join(", ", conflict.ChosenRepos)}" }
+                    .Concat(conflict.DiscardedSources
+                        .Select(d => $"{d.Version} <- {string.Join(", ", d.Repos)}"));
+                Log(progress, LogEntry.Info(
+                    $"{conflict.PackageId} wird in mehreren Versionen gebraucht "
+                    + $"({string.Join(" | ", alle)}) - alle landen im Bundle"));
             }
 
-            Report(progress, BundlePhase.Restoring, 0.4, $"Erzeuge Anker-Projekt ({dedup.Packages.Count} Pakete)");
+            Report(progress, BundlePhase.Restoring, 0.4,
+                $"Erzeuge Anker-Projekte ({perRepo.Count} Repos)");
             if (Directory.Exists(config.WorkDirectory))
                 Directory.Delete(config.WorkDirectory, recursive: true);
-            _anchor.WriteToWorkDirectory(
-                config.WorkDirectory, dedup.Packages, out var anchorPath, allTfms);
-            Log(progress, LogEntry.Info(
-                $"Anker-Projekt: {dedup.Packages.Count} Pakete, TFMs "
-                + (allTfms.Count == 0 ? "net10.0 (Rückfall)" : string.Join(";", allTfms.OrderBy(x => x)))
-                + ", transitives Pinning aktiv"));
             Directory.CreateDirectory(hierCache);
 
-            Report(progress, BundlePhase.Restoring, 0.45, "dotnet restore ...");
-            var restored = await _restore.RestoreAsync(
-                dotnetPath, anchorPath, hierCache, config.TargetRids,
-                onLine: line => Log(progress, ToLogEntry(line)),
-                ct: ct
-            ).ConfigureAwait(false);
-            if (!restored)
-                return Fail(sw, "dotnet restore fehlgeschlagen. Log oben prüfen.");
+            // EIN ANKER PRO REPO, gemeinsamer Paket-Cache.
+            //
+            // WARUM NICHT ein gemeinsamer Anker mit der deduplizierten Liste: Ein
+            // Projekt kann pro Paket nur EINE Version referenzieren. Der Dedup
+            // ("hoechste gewinnt") warf damit genau die Versionen weg, die ein
+            // anderes Repo bewusst pinnt — real: Checkmk pinnt
+            // Tmds.DBus.Protocol auf 0.94.1, weil Avalonia 12.1.0 sonst eine
+            // MissingTypeException wirft; Klemmbrett-Scaffold will 0.94.2, und im
+            // Bundle landete nur 0.94.2. Offline baut Checkmk dann trotzdem
+            // durch — NuGet loest mit NU1603 still auf die naechsthoehere Version
+            // auf — und faellt erst zur Laufzeit um.
+            //
+            // Pro Repo restored bekommt jedes Repo exakt seine Versionen samt
+            // eigener transitiver Aufloesung und eigener TFMs. Der gemeinsame
+            // Cache sammelt die Vereinigungsmenge.
+            var anchorRoot = Path.Combine(config.WorkDirectory, "anchors");
+            var repoNames = perRepo.Keys.OrderBy(k => k, StringComparer.OrdinalIgnoreCase).ToList();
+            var restoredRepos = 0;
+
+            for (var i = 0; i < repoNames.Count; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var repoName = repoNames[i];
+                var analysis = perRepo[repoName];
+                if (analysis.Packages.Count == 0)
+                {
+                    Log(progress, LogEntry.Warn($"{repoName}: keine Pakete gefunden - übersprungen"));
+                    continue;
+                }
+
+                // Innerhalb eines Repos kann dasselbe Paket aus mehreren csproj
+                // kommen; doppelte PackageReference-Eintraege waeren NU1504.
+                var repoPackages = _deduplicator.Deduplicate(analysis.Packages).Packages;
+                var repoDir = Path.Combine(anchorRoot, Slug(repoName));
+
+                _anchor.WriteToWorkDirectory(
+                    repoDir, repoPackages, out var anchorPath, analysis.TargetFrameworks);
+
+                var tfmText = analysis.TargetFrameworks.Count == 0
+                    ? "net10.0 (Rückfall)"
+                    : string.Join(";", analysis.TargetFrameworks.OrderBy(x => x));
+                Log(progress, LogEntry.Info(
+                    $"{repoName}: Anker mit {repoPackages.Count} Paketen, TFMs {tfmText}"));
+
+                Report(progress, BundlePhase.Restoring,
+                    0.4 + 0.45 * (i + 1) / repoNames.Count,
+                    $"restore {i + 1}/{repoNames.Count}: {repoName}");
+
+                var ok = await _restore.RestoreAsync(
+                    dotnetPath, anchorPath, hierCache, config.TargetRids,
+                    onLine: line => Log(progress, ToLogEntry(line)),
+                    ct: ct
+                ).ConfigureAwait(false);
+
+                if (!ok)
+                    return Fail(sw, $"dotnet restore fehlgeschlagen für {repoName}. Log oben prüfen.");
+
+                restoredRepos++;
+            }
+
+            if (restoredRepos == 0)
+                return Fail(sw, "Kein einziges Repo lieferte Pakete - Bundle wäre leer.");
 
             Report(progress, BundlePhase.Assembling, 0.85, "Kopiere .nupkg in Zielordner");
             var assemble = _assembler.Assemble(hierCache, config.OutputDirectory,
@@ -136,6 +189,14 @@ public sealed class BundleOrchestrator
             Report(progress, BundlePhase.Failed, 0, "Fehlgeschlagen: " + ex.Message);
             return Fail(sw, ex.Message);
         }
+    }
+
+    /// <summary>Repo-Name in einen Ordnernamen umsetzen ("LHP542/Checkmk" -> "LHP542_Checkmk").</summary>
+    private static string Slug(string ownerRepo)
+    {
+        var chars = ownerRepo.Select(c => Path.GetInvalidFileNameChars().Contains(c) || c is '/' or '\\'
+            ? '_' : c).ToArray();
+        return new string(chars);
     }
 
     private async Task<Dictionary<string, RepoAnalysis>> AnalyzeAllAsync(

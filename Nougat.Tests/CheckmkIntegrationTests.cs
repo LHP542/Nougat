@@ -59,4 +59,51 @@ public class CheckmkIntegrationTests
             File.Exists(Path.Combine(outDir, "Directory.Packages.props")).Should().BeTrue();
         }
     }
+
+    /// <summary>
+    /// Zwei Repos, die dasselbe Paket in unterschiedlichen Versionen festlegen.
+    /// Checkmk pinnt Tmds.DBus.Protocol bewusst auf 0.94.1 (Avalonia 12.1.0 wirft
+    /// sonst eine MissingTypeException), Klemmbrett-Scaffold nutzt 0.94.2. Beide
+    /// Versionen müssen ins Bundle — sonst löst der Offline-Restore mit NU1603
+    /// still auf die falsche auf und die App fällt erst zur Laufzeit um.
+    /// </summary>
+    [Fact]
+    public async Task Zwei_Repos_mit_unterschiedlichen_Versionen_bekommen_eigene_Anker()
+    {
+        if (!Enabled)
+            Assert.Skip("NOUGAT_INTEGRATION=1 setzen, um gegen die echte API zu testen.");
+
+        var services = new ServiceCollection();
+        services.AddHttpClient(GithubRepoService.HttpClientName, c =>
+            c.DefaultRequestHeaders.UserAgent.ParseAdd("Nougat-Test/1.0"));
+        var factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
+        var github = new GithubRepoService(factory, NullLogger<GithubRepoService>.Instance);
+        var analyzer = new CsprojAnalyzer(github, NullLogger<CsprojAnalyzer>.Instance);
+        var dedup = new PackageDeduplicator();
+        var gen = new AnchorProjectGenerator();
+
+        var outRoot = Environment.GetEnvironmentVariable("NOUGAT_INTEGRATION_OUT");
+        var versions = new List<string>();
+
+        foreach (var repo in new[] { "LHP542/Checkmk", "LHP542/Klemmbrett-Scaffold" })
+        {
+            var analysis = await analyzer.AnalyzeRepoAsync(repo, "main", TestContext.Current.CancellationToken);
+            var packages = dedup.Deduplicate(analysis.Packages).Packages;
+
+            var tmds = packages.FirstOrDefault(p => p.Id == "Tmds.DBus.Protocol");
+            if (tmds?.Version is { } v) versions.Add(v);
+
+            if (!string.IsNullOrWhiteSpace(outRoot))
+            {
+                gen.WriteToWorkDirectory(
+                    Path.Combine(outRoot, "anchors", repo.Replace('/', '_')),
+                    packages, out _, analysis.TargetFrameworks);
+            }
+        }
+
+        // Kein Dedup ueber Repo-Grenzen: Jedes Repo behaelt seine Version.
+        versions.Should().HaveCount(2);
+        versions.Should().Contain("0.94.1");
+        versions.Should().Contain("0.94.2");
+    }
 }
