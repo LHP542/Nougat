@@ -15,9 +15,9 @@
 - **UI:** MainWindow (Repos links, Log rechts, Fortschritt im Footer), SettingsWindow, InfoWindow, SdkInstallWindow, ErrorWindow. Alles im Card-Look mit der vollen Style-Bibliothek aus dem kroste-avalonia-Skill.
 - **Lokalisierung:** Deutsch + Englisch, 73 Keys, Live-Wechsel über die Einstellungen ohne Neustart.
 - **Self-Update:** `UpdateService` prüft `/releases/latest` und installiert auf Klick im Über-Fenster (Windows-ZIP, Linux-tar.gz, AppImage).
-- **50 Unit-Tests, alle grün** (< 100 ms). `dotnet build` und `dotnet test` grün, CI auf GitHub grün.
+- **64 Unit-Tests, alle grün** (< 100 ms), dazu ein Integrationstest gegen die echte GitHub-API (Env-Gate `NOUGAT_INTEGRATION=1`, im CI übersprungen). `dotnet build` und `dotnet test` grün, CI auf GitHub grün.
 - **Live gegen die echte GitHub-API geprüft:** App startet, Tray installiert sich, Update-Check läuft (200, Version korrekt verglichen), Logfile sauber.
-- **Offen:** End-to-End-Bundle-Bau mit echtem `dotnet restore` ist noch nicht gelaufen.
+- **Anker-Erzeugung end-to-end verifiziert:** Analyse von LHP542/Checkmk über die echte API, Anker generiert, restored, gegen den echten Bedarf verglichen — deckungsgleich. Offen bleibt der vollständige Durchlauf inklusive Zielordner-Assembly über die UI.
 
 ## Roadmap
 
@@ -32,6 +32,11 @@
 - Vorbild-Skript: `nuget-offline-bundle.sh` (bewusst im Repo-Root belassen).
 - App-Struktur folgt Allpaca (Kroste-Referenzprojekt für Konventionen).
 - **CPM-Merge-Regel** im `CsprojAnalyzer`: PackageReference ohne Version wird über `Directory.Packages.props` desselben Repos aufgelöst; nicht auffindbar → Warning, überspringen (nie eine Version raten).
+- **Reine Pins werden mitgesammelt.** `PackageVersion`-Einträge ohne zugehörige `PackageReference` sind kein Müll, sondern transitive Pins (`CentralPackageTransitivePinningEnabled`). Bei Checkmk stehen 11 von 30 Einträgen nur deshalb dort. Nougat sammelt sie unabhängig davon, ob das Flag im Quell-Repo gesetzt ist — ein Paket zu viel kostet ein paar hundert KB, ein fehlendes bricht den Offline-Build.
+- **Der Anker arbeitet selbst mit CPM + transitivem Pinning.** Ohne das löst NuGet transitive Abhängigkeiten auf die *niedrigste* passende Version auf: Das Bundle enthielt `System.Configuration.ConfigurationManager` 9.0.11, während Checkmk 10.0.11 auflöst, und `Microsoft.Extensions.*` lagen in drei Versionen nebeneinander.
+- **Der Anker targetet alle TFMs der ausgewählten Repos** (aus csproj und `Directory.Build.props` eingesammelt, MSBuild-Properties wie `$(Tfm)` werden verworfen). NuGet löst pro TFM einen eigenen Graphen auf — ein reiner `net10.0`-Anker zieht für ein `net10.0-windows`-Projekt weder `Microsoft.WindowsDesktop.App.Ref` noch `Microsoft.Windows.SDK.NET.Ref`. `EnableWindowsTargeting=true` ist Pflicht, damit das unter Linux nicht mit NETSDK1100 abbricht.
+- **Submodule sind für Nougat unsichtbar.** Checkmk bindet seine Plugins als Submodule ein; im Git-Tree stehen sie nur als Commit-Verweis. Wer das Plugin-Bundle braucht, muss `Checkmk-Plugin-*` separat anhaken.
+- **Verifiziert gegen LHP542/Checkmk** (26.08.2026): Bundle deckt den Bedarf des echten `dotnet restore` vollständig ab — 0 fehlende Paket-IDs, 0 abweichende Versionen. Vorher: 26 fehlende IDs, 7 falsche Versionen. `Nougat.Tests/CheckmkIntegrationTests.cs` hält das fest (läuft nur mit `NOUGAT_INTEGRATION=1`).
 - **Deduplizierung:** `Semver.SortOrderComparer` bevorzugt, dann `System.Version`, dann `StringComparer.OrdinalIgnoreCase` als Notnagel; Range-Strings wie `[7.2.2,8.0.0)` werden auf die untere Grenze normalisiert. `PackageVersionSelector.IsNewer` nutzt dieselbe Ordnung für den Update-Check.
 - **SDK-Bootstrap** installiert bewusst nach `~/.dotnet-nougat` (nicht `~/.dotnet`), damit das globale Distrobox/Bazzite-SDK unangetastet bleibt.
 - **Secrets:** GitHub-PAT inline im `settings.json` als `"pat": "ENC1:<base64>"` (AES-GCM, Master-Key `~/.config/Nougat/protect.key`, chmod 0600). Bewusst kein libsecret — vermeidet DBus-Dependency.

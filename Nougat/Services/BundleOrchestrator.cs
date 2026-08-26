@@ -62,7 +62,10 @@ public sealed class BundleOrchestrator
 
             Report(progress, BundlePhase.Analyzing, 0.05, "Analysiere Repos ...");
             var perRepo = await AnalyzeAllAsync(config.SelectedRepos, repoBranchMap, progress, ct).ConfigureAwait(false);
-            var allPackages = perRepo.Values.SelectMany(v => v).ToList();
+            var allPackages = perRepo.Values.SelectMany(v => v.Packages).ToList();
+            var allTfms = perRepo.Values
+                .SelectMany(v => v.TargetFrameworks)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             Report(progress, BundlePhase.Deduplicating, 0.35, "Dedupliziere Pakete");
             var dedup = _deduplicator.Deduplicate(allPackages);
@@ -80,7 +83,12 @@ public sealed class BundleOrchestrator
             Report(progress, BundlePhase.Restoring, 0.4, $"Erzeuge Anker-Projekt ({dedup.Packages.Count} Pakete)");
             if (Directory.Exists(config.WorkDirectory))
                 Directory.Delete(config.WorkDirectory, recursive: true);
-            _anchor.WriteToWorkDirectory(config.WorkDirectory, dedup.Packages, out var anchorPath);
+            _anchor.WriteToWorkDirectory(
+                config.WorkDirectory, dedup.Packages, out var anchorPath, allTfms);
+            Log(progress, LogEntry.Info(
+                $"Anker-Projekt: {dedup.Packages.Count} Pakete, TFMs "
+                + (allTfms.Count == 0 ? "net10.0 (Rückfall)" : string.Join(";", allTfms.OrderBy(x => x)))
+                + ", transitives Pinning aktiv"));
             Directory.CreateDirectory(hierCache);
 
             Report(progress, BundlePhase.Restoring, 0.45, "dotnet restore ...");
@@ -130,14 +138,14 @@ public sealed class BundleOrchestrator
         }
     }
 
-    private async Task<Dictionary<string, List<PackageRef>>> AnalyzeAllAsync(
+    private async Task<Dictionary<string, RepoAnalysis>> AnalyzeAllAsync(
         IReadOnlyList<string> selectedRepos,
         IReadOnlyDictionary<string, string> repoBranchMap,
         IProgress<BundleProgress>? progress,
         CancellationToken ct)
     {
         using var throttle = new SemaphoreSlim(4);
-        var results = new Dictionary<string, List<PackageRef>>(StringComparer.OrdinalIgnoreCase);
+        var results = new Dictionary<string, RepoAnalysis>(StringComparer.OrdinalIgnoreCase);
         var lockObj = new object();
 
         var done = 0;
@@ -149,21 +157,28 @@ public sealed class BundleOrchestrator
             try
             {
                 var branch = repoBranchMap.TryGetValue(fullName, out var b) ? b : "main";
-                var pkgs = await _analyzer.AnalyzeAsync(fullName, branch, ct).ConfigureAwait(false);
+                var analysis = await _analyzer.AnalyzeRepoAsync(fullName, branch, ct).ConfigureAwait(false);
                 lock (lockObj)
                 {
-                    results[fullName] = pkgs;
+                    results[fullName] = analysis;
                     done++;
+                    var count = analysis.Packages.Count;
                     Report(progress, BundlePhase.Analyzing, 0.05 + 0.3 * done / total,
-                        $"Analyse {done}/{total}: {fullName} ({pkgs.Count} Pakete)");
-                    Log(progress, LogEntry.Info($"{fullName}: {pkgs.Count} PackageReferences"));
+                        $"Analyse {done}/{total}: {fullName} ({count} Pakete)");
+                    Log(progress, LogEntry.Info(
+                        $"{fullName}: {count} Pakete, TFMs: "
+                        + (analysis.TargetFrameworks.Count == 0
+                            ? "keine erkannt"
+                            : string.Join(";", analysis.TargetFrameworks))));
                 }
             }
             catch (Exception ex)
             {
                 lock (lockObj)
                 {
-                    results[fullName] = [];
+                    // Leeres Ergebnis: Ein kaputtes Repo darf den Bundle-Bau nicht
+                    // abbrechen, die Fehlerzeile steht im Log.
+                    results[fullName] = new RepoAnalysis([], []);
                     done++;
                     Log(progress, LogEntry.Error($"{fullName}: Analyse fehlgeschlagen - {ex.Message}"));
                 }

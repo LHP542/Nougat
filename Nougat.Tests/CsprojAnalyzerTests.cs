@@ -91,3 +91,60 @@ public class CsprojAnalyzerTests
         result[0].Condition.Should().Be("'$(Configuration)' == 'Debug'");
     }
 }
+
+public class CsprojAnalyzerPinTests
+{
+    private const string PropsMitPinning = """
+        <Project>
+          <PropertyGroup>
+            <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+            <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+          </PropertyGroup>
+          <ItemGroup>
+            <PackageVersion Include="NLog" Version="6.2.0" />
+            <PackageVersion Include="System.Configuration.ConfigurationManager" Version="10.0.11" />
+          </ItemGroup>
+        </Project>
+        """;
+
+    [Fact]
+    public void Erkennt_aktives_transitives_Pinning()
+    {
+        var versions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        CsprojAnalyzer.ParseCpm(PropsMitPinning, versions).Should().BeTrue();
+        versions.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void Ohne_Schalter_kein_Pinning()
+    {
+        const string ohne = """
+            <Project>
+              <ItemGroup><PackageVersion Include="NLog" Version="6.2.0" /></ItemGroup>
+            </Project>
+            """;
+        CsprojAnalyzer.ParseCpm(ohne, new Dictionary<string, string>()).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("<Project><PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup></Project>", "net10.0")]
+    [InlineData("<Project><PropertyGroup><TargetFramework>net10.0-windows10.0.19041.0</TargetFramework></PropertyGroup></Project>", "net10.0-windows10.0.19041.0")]
+    [InlineData("<Project><PropertyGroup><TargetFrameworks>net10.0;net8.0</TargetFrameworks></PropertyGroup></Project>", "net10.0,net8.0")]
+    public void Liest_TargetFrameworks(string xml, string erwartet)
+    {
+        var tfms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        CsprojAnalyzer.CollectTargetFrameworks(xml, tfms);
+        string.Join(",", tfms.OrderBy(t => t)).Should().Be(erwartet);
+    }
+
+    [Fact]
+    public void Unaufloesbare_MSBuild_Properties_werden_verworfen()
+    {
+        // $(...) kann Nougat nicht auswerten; im Anker wuerde der Platzhalter
+        // den Restore zerlegen. Lieber der net10.0-Rueckfall.
+        var tfms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        CsprojAnalyzer.CollectTargetFrameworks(
+            "<Project><PropertyGroup><TargetFramework>$(MeinTfm)</TargetFramework></PropertyGroup></Project>", tfms);
+        tfms.Should().BeEmpty();
+    }
+}

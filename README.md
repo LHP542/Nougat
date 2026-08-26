@@ -18,6 +18,8 @@ Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine
 - Repo-Liste der Organisation `LHP542` via API (mit Cache + optionalem PAT für 5000 Requests/h und Zugriff auf private Repos).
 - Ein gemeinsames Bundle aus mehreren Repos, mit automatischer Deduplizierung bei Version-Konflikten (höchste Version gewinnt).
 - CPM-aware: `PackageReference` ohne Version wird per `Directory.Packages.props` desselben Repos aufgelöst.
+- **Transitive Pins inklusive:** Nutzt ein Repo `CentralPackageTransitivePinningEnabled`, stehen in seiner `Directory.Packages.props` Pakete, die kein Projekt direkt referenziert. Nougat sammelt sie mit und pinnt sie im Anker genauso — sonst landen im Bundle die niedrigsten statt der tatsächlich aufgelösten Versionen.
+- **Baut gegen alle TargetFrameworks der ausgewählten Repos**, damit auch die Windows-Ref- und Runtime-Packs eines `net10.0-windows`-Projekts im Bundle liegen.
 - Live-Log des `dotnet restore`-Fortschritts im UI, mit Cancel-Support.
 - .NET-10-SDK-Bootstrap: falls kein passendes SDK gefunden wird, kann Nougat es per `dotnet-install`-Skript nach `~/.dotnet-nougat` installieren (kein sudo, kein System-Umbau).
 - Zielordner wird vor jedem Lauf komplett geleert — analog zum Referenz-Skript.
