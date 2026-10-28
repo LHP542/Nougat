@@ -20,14 +20,36 @@ public sealed class GithubRateLimitedException : GithubApiException
 }
 
 /// <summary>
-/// Dünnschichtiger Wrapper um die GitHub REST-API.
-/// Named HttpClient "github" liefert User-Agent, System-Proxy und optional das Bearer-Token.
+/// Dünnschichtiger Wrapper um die REST-API der eigenen Forge.
+///
+/// <para><b>Seit dem 28.10.2026 git.flexfamily.de statt GitHub.</b> Lars:
+/// die Repos der Arbeitsgruppe sollen nicht mehr von GitHub gezogen werden.
+/// Forgejos API ist in den hier genutzten Endpunkten feldgleich —
+/// <c>/orgs/{name}/repos</c>, <c>/users/{name}/repos</c> und
+/// <c>git/trees/{ref}?recursive=1</c> liefern dieselben Felder, geprüft am
+/// 28.10.2026 gegen LHP542/Nougat (127 Einträge, <c>truncated: false</c>).</para>
+///
+/// <para><b>Zwei Unterschiede stecken im Detail:</b> Forgejo paginiert mit
+/// <c>limit</c> statt <c>per_page</c>, und Rohdateien liegen unter
+/// <c>&lt;forge&gt;/&lt;owner&gt;/&lt;repo&gt;/raw/branch/&lt;zweig&gt;/&lt;pfad&gt;</c>
+/// — mit <c>branch/</c> dazwischen, sonst 404.</para>
+///
+/// <para>Der Klassenname bleibt: Er steht in neun Dateien, und ein
+/// Umbenennen würde den Umbau größer machen als die Sache ist.</para>
+///
+/// Named HttpClient "github" liefert User-Agent, System-Proxy und optional das Token.
 /// </summary>
 public sealed class GithubRepoService
 {
     public const string HttpClientName = "github";
-    private const string ApiRoot = "https://api.github.com";
-    private const string RawRoot = "https://raw.githubusercontent.com";
+
+    /// <summary>Wurzel der Forgejo-API. <c>git.flexfamily.de</c> und
+    /// <c>git.flexfamily.cloud</c> zeigen auf dieselbe Instanz; hier steht der
+    /// Name, den Lars genannt hat.</summary>
+    private const string ApiRoot = "https://git.flexfamily.de/api/v1";
+
+    /// <summary>Wurzel für Rohdateien und Seiten (ohne <c>/api/v1</c>).</summary>
+    private const string RawRoot = "https://git.flexfamily.de";
 
     private static readonly JsonSerializerOptions _json = new()
     {
@@ -59,11 +81,12 @@ public sealed class GithubRepoService
     /// </summary>
     public async Task<List<RepoInfo>> ListUserReposAsync(string account, CancellationToken ct = default)
     {
-        // Achtung, die beiden Endpunkte kennen verschiedene type-Werte:
-        // /orgs/ akzeptiert all|public|private|forks|sources|member,
-        // /users/ dagegen all|owner|member. Ein "type=owner" an /orgs/
-        // quittiert GitHub mit 422 — deshalb steht die Query beim Endpunkt und
-        // nicht in der gemeinsamen Schleife.
+        // Achtung, die beiden Endpunkte kannten bei GitHub verschiedene
+        // type-Werte: /orgs/ akzeptierte all|public|private|forks|sources|
+        // member, /users/ dagegen all|owner|member; ein "type=owner" an /orgs/
+        // quittierte GitHub mit 422. Forgejo ist hier gleichgültig und
+        // ignoriert den Parameter — er bleibt stehen, damit die Methode auch
+        // gegen GitHub arbeiten könnte, solange beides parallel läuft.
         var fromOrg = await ListFromAsync($"{ApiRoot}/orgs/{account}/repos", "all", account, ct)
             .ConfigureAwait(false);
         if (fromOrg is not null) return fromOrg;
@@ -82,7 +105,10 @@ public sealed class GithubRepoService
 
         for (var page = 1; ; page++)
         {
-            var url = $"{endpoint}?per_page=100&type={type}&page={page}";
+            // Forgejo paginiert mit `limit`, GitHub mit `per_page`. Beide
+            // ignorieren den jeweils fremden Parameter, deshalb stehen hier
+            // beide — so arbeitet dieselbe Schleife gegen beide Seiten.
+            var url = $"{endpoint}?limit=100&per_page=100&type={type}&page={page}";
             using var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
 
@@ -105,7 +131,7 @@ public sealed class GithubRepoService
             if (!resp.IsSuccessStatusCode)
             {
                 var body = await resp.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-                throw new GithubApiException($"GitHub-API-Fehler {(int)resp.StatusCode}: {body}");
+                throw new GithubApiException($"API-Fehler {(int)resp.StatusCode}: {body}");
             }
 
             await using var stream = await resp.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
@@ -116,7 +142,7 @@ public sealed class GithubRepoService
             if (pageItems.Count < 100) break;
         }
 
-        _logger.LogInformation("GitHub: {Count} Repos für {Account} geladen ({Endpoint})",
+        _logger.LogInformation("Forge: {Count} Repos für {Account} geladen ({Endpoint})",
             result.Count, account, endpoint);
         return result;
     }
@@ -156,7 +182,9 @@ public sealed class GithubRepoService
     public async Task<string> GetRawFileAsync(string ownerRepo, string branch, string path, CancellationToken ct = default)
     {
         var client = _factory.CreateClient(HttpClientName);
-        var url = $"{RawRoot}/{ownerRepo}/{branch}/{path}";
+        // Forgejos Entsprechung zu raw.githubusercontent.com. Das `branch/`
+        // gehört dazu: Ohne es antwortet die Forge mit 404.
+        var url = $"{RawRoot}/{ownerRepo}/raw/branch/{branch}/{path}";
         using var resp = await client.GetAsync(url, ct).ConfigureAwait(false);
         if (!resp.IsSuccessStatusCode)
             throw new GithubApiException($"Raw-Fetch {(int)resp.StatusCode}: {url}");

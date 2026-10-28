@@ -23,19 +23,28 @@ public sealed record UpdateCheckResult(
 }
 
 /// <summary>
-/// Update-Check und echtes Self-Update gegen GitHub Releases (Kroste-Standard:
-/// reine Benachrichtigung reicht nicht).
+/// Update-Check und echtes Self-Update gegen die Releases der eigenen Forge
+/// (Kroste-Standard: reine Benachrichtigung reicht nicht).
 ///
-/// Besonderheit gegenüber der RenPack-Vorlage: Der Download läuft über die
-/// Asset-API-URL mit "Accept: application/octet-stream" statt über
-/// browser_download_url. Für das aktuell öffentliche Repo wäre beides möglich,
-/// aber nur dieser Weg trägt auch, wenn die Organisation ihre Repos auf privat
-/// stellt — dort ist browser_download_url nicht anonym abrufbar. Der bestehende
-/// named HttpClient "github" schickt einen konfigurierten PAT automatisch mit
-/// und bringt den System-Proxy gleich mit.
+/// <para><b>Seit dem 28.10.2026 git.flexfamily.de statt GitHub.</b> Die
+/// Release-API ist feldgleich, mit einer Ausnahme, und die hat es in sich:
+/// <b>Forgejo kennt kein <c>assets[].url</c></b> — es liefert je Paket nur
+/// <c>browser_download_url</c>. Der bisherige Weg über die Asset-API-URL mit
+/// <c>Accept: application/octet-stream</c> gibt es dort also nicht; die
+/// Download-Adresse nimmt dafür den Authorization-Kopf an, auch bei einem
+/// privaten Repo.</para>
+///
+/// <para><b>Ein 200 heißt nicht, dass eine Datei kommt.</b> Läuft die Forge
+/// mit <c>REQUIRE_SIGNIN_VIEW</c>, bekommt ein unangemeldeter Abruf die
+/// Login-Seite — <c>text/html</c>, 12 KB, Statuscode 200. Ohne Prüfung des
+/// Inhaltstyps landet eine Webseite als Paket auf der Platte.</para>
+///
+/// Der named HttpClient "github" schickt ein konfiguriertes Token automatisch
+/// mit und bringt den System-Proxy gleich mit.
 /// </summary>
 public sealed class UpdateService
 {
+    private const string ApiRoot = "https://git.flexfamily.de/api/v1";
     private const string Owner = "LHP542";
     private const string Repo = "Nougat";
 
@@ -65,7 +74,7 @@ public sealed class UpdateService
 
         var current = AppVersion.Current;
         var sw = Stopwatch.StartNew();
-        var url = $"https://api.github.com/repos/{Owner}/{Repo}/releases/latest";
+        var url = $"{ApiRoot}/repos/{Owner}/{Repo}/releases/latest";
 
         try
         {
@@ -73,7 +82,9 @@ public sealed class UpdateService
 
             using var client = _httpClientFactory.CreateClient(GithubRepoService.HttpClientName);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            // Forgejo kennt den GitHub-Medientyp nicht und antwortet auf
+            // application/json; GitHub hätte beides akzeptiert.
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             using var response = await client.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)
@@ -182,12 +193,24 @@ public sealed class UpdateService
     {
         using var client = _httpClientFactory.CreateClient(GithubRepoService.HttpClientName);
         using var request = new HttpRequestMessage(HttpMethod.Get, asset.Url);
-        // Pflicht: Die Asset-API liefert nur mit diesem Accept-Header die
-        // Binärdaten statt der JSON-Metadaten.
+        // Bei GitHub war dieser Kopf Pflicht: Die Asset-API lieferte sonst die
+        // JSON-Metadaten statt der Binärdaten. Forgejo liefert unter
+        // browser_download_url ohnehin die Datei; der Kopf schadet nicht und
+        // bleibt als Absicherung stehen.
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
 
         using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
+
+        // **Ein 200 heißt hier nicht, dass eine Datei kommt.** Läuft die Forge
+        // mit REQUIRE_SIGNIN_VIEW, liefert sie einem unangemeldeten Abruf die
+        // Login-Seite — text/html, rund 12 KB, Statuscode 200.
+        // EnsureSuccessStatusCode lässt das durch, und der Updater schreibt
+        // eine Webseite als Paket auf die Platte.
+        var mediaType = response.Content.Headers.ContentType?.MediaType;
+        if (mediaType is not null && mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
+            throw new GithubApiException(
+                $"Statt des Pakets kam {mediaType} — vermutlich die Anmeldeseite. Token prüfen.");
 
         var total = response.Content.Headers.ContentLength ?? asset.Size;
         await using var source = await response.Content.ReadAsStreamAsync(ct);
@@ -377,8 +400,14 @@ public sealed class UpdateService
     public sealed class ReleaseAsset
     {
         [JsonPropertyName("name")] public string Name { get; set; } = "";
-        /// <summary>API-URL des Assets — für private Repos der einzig nutzbare Weg.</summary>
-        [JsonPropertyName("url")] public string Url { get; set; } = "";
+        /// <summary>Download-Adresse des Pakets.
+        ///
+        /// <para>Hieß bei GitHub <c>url</c> (die API-Adresse) — Forgejo kennt
+        /// das Feld nicht und liefert nur <c>browser_download_url</c>. Die
+        /// nimmt den Authorization-Kopf an, auch bei einem privaten Repo;
+        /// GitHubs <c>browser_download_url</c> tat das nicht, daher der
+        /// Umweg über die API.</para></summary>
+        [JsonPropertyName("browser_download_url")] public string Url { get; set; } = "";
         [JsonPropertyName("size")] public long Size { get; set; }
     }
 }

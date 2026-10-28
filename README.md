@@ -1,21 +1,24 @@
 # Nougat
 
 > Projekt der **Arbeitsgruppe 5424 IT-Basis-Dienste** der Landeshauptstadt Potsdam.
-> Alle dienstlichen Repos liegen in der GitHub-Organisation [LHP542](https://github.com/LHP542).
+> Alle dienstlichen Repos liegen in der Organisation [LHP542](https://git.flexfamily.de/LHP542)
+> auf git.flexfamily.de.
+>
+> **Dienstrechner laden nichts aus dem Internet.** Updates holen die Anwendungen
+> dort aus dem Samba-Share, nicht von einem Server draußen.
 
-[![CI](https://github.com/LHP542/Nougat/actions/workflows/ci.yml/badge.svg)](https://github.com/LHP542/Nougat/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/LHP542/Nougat)](https://github.com/LHP542/Nougat/releases)
+[![Release](https://git.flexfamily.de/LHP542/Nougat/badges/release.svg)](https://git.flexfamily.de/LHP542/Nougat/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Offline-NuGet-Bundle-Builder für die Repos der Organisation LHP542 — Desktop-App für Windows und Linux (C# / .NET 10 / Avalonia 12).
 
-Nougat listet die GitHub-Repos der Organisation `LHP542` per Checkbox auf, sammelt aus den markierten Repos alle `PackageReference`-Einträge (inklusive Central Package Management), führt `dotnet restore` aus und schreibt einen flachen `NuGet-Local`-Ordner samt `nuget.config.windows` und `README.txt` — bereit für die Offline-Installation auf dem Arbeitslaptop.
+Nougat listet die Repos der Organisation `LHP542` auf git.flexfamily.de per Checkbox auf, sammelt aus den markierten Repos alle `PackageReference`-Einträge (inklusive Central Package Management), führt `dotnet restore` aus und schreibt einen flachen `NuGet-Local`-Ordner samt `nuget.config.windows` und `README.txt` — bereit für die Offline-Installation auf dem Arbeitslaptop.
 
 Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine hart-codierte Paketliste mehr.
 
 ## Features
 
-- Repo-Liste der Organisation `LHP542` via API (mit Cache + optionalem PAT für 5000 Requests/h und Zugriff auf private Repos).
+- Repo-Liste der Organisation `LHP542` via API (mit Cache + optionalem Token für den Zugriff auf private Repos).
 - Ein gemeinsames Bundle aus mehreren Repos. Legen zwei Repos dasselbe Paket in **unterschiedlichen Versionen** fest, landen **beide** im Bundle — jedes Repo wird einzeln restored und bekommt genau die Version, die es selbst festlegt. (Nur die höchste zu nehmen wäre gefährlich: NuGet löst offline still auf die nächsthöhere auf, und der Fehler zeigt sich erst zur Laufzeit.)
 - CPM-aware: `PackageReference` ohne Version wird per `Directory.Packages.props` desselben Repos aufgelöst.
 - **Transitive Pins inklusive:** Nutzt ein Repo `CentralPackageTransitivePinningEnabled`, stehen in seiner `Directory.Packages.props` Pakete, die kein Projekt direkt referenziert. Nougat sammelt sie mit und pinnt sie im Anker genauso — sonst landen im Bundle die niedrigsten statt der tatsächlich aufgelösten Versionen.
@@ -29,7 +32,7 @@ Nachbau/Ersatz des `nuget-offline-bundle.sh`-Skripts, aber datengetrieben: keine
 
 ## Installation
 
-Fertige Pakete gibt es auf der [Releases-Seite](https://github.com/LHP542/Nougat/releases):
+Fertige Pakete gibt es auf der [Releases-Seite](https://git.flexfamily.de/LHP542/Nougat/releases):
 
 **Windows:** `Nougat-X.Y.Z-win-x64.zip` herunterladen, entpacken, `Nougat.exe` starten. Keine Installation nötig (self-contained, .NET ist enthalten).
 

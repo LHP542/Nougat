@@ -25,8 +25,10 @@ public static class GithubHttpClientFactory
             var pat = secretStore?.Unprotect(settings?.EncryptedPat);
             if (!string.IsNullOrWhiteSpace(pat))
             {
+                // Forgejo erwartet das Schema "token"; mit "Bearer" antwortet
+                // es 401. GitHub akzeptierte beides.
                 client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", pat);
+                    new AuthenticationHeaderValue("token", pat);
                 MaskingLayoutRenderer.Register(pat);
             }
         })
