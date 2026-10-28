@@ -44,7 +44,7 @@ public sealed class GithubRepoService
     public const string HttpClientName = "github";
 
     /// <summary>Wurzel der Forgejo-API. <c>git.flexfamily.de</c> und
-    /// <c>git.flexfamily.cloud</c> zeigen auf dieselbe Instanz; hier steht der
+    /// <c>git.flexfamily.de</c> zeigen auf dieselbe Instanz; hier steht der
     /// Name, den Lars genannt hat.</summary>
     private const string ApiRoot = "https://git.flexfamily.de/api/v1";
 
